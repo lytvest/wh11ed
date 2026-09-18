@@ -49,13 +49,14 @@
 import { computed } from 'vue'
 import { landing } from '../data/landing.js'
 import { useLocale } from '../composables/useLocale.js'
+import { withBase } from '../config.js'
 
 // The author's Ozon Bank SBP page — pays from any Russian bank, no fee. The QR encodes this
 // exact URL (verified when it was added); replacing one means replacing the other, and the
 // image must be RENAMED rather than overwritten (public/images/CLAUDE.md — a stale QR would
 // sit in the image cache of everyone who ever opened this page).
 const PAY_URL = 'https://finance.ozon.ru/apps/sbp/ozonbankpay/01a09910-df13-7ba4-bf5e-0166fd7b8433'
-const qrSrc = '/images/support-qr-ozon.png'
+const qrSrc = withBase('/images/support-qr-ozon.png')
 
 const { locale } = useLocale()
 const s = computed(() => landing[locale.value].footer.support)

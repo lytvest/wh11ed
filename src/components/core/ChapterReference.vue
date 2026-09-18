@@ -186,7 +186,7 @@
           rel="noopener"
         >
           <img
-            src="/images/wh40k-app-qr.png"
+            :src="qrSrc"
             alt="QR code — Warhammer 40,000 App"
             class="qr-img"
           >
@@ -325,10 +325,14 @@ import { useRoute } from 'vue-router'
 import { ui } from '../../i18n/ui.js'
 import { abilityIntro, coreAbilities, appendix, errata, faqs } from '../../data/reference.js'
 import { chunkSubsections } from '../../composables/columnChunks.js'
+import { withBase } from '../../config.js'
 
 const { renderInline } = useRenderInline()
 const { locale } = useLocale()
 const route = useRoute()
+
+// Root-absolute in the template would leave the deployment's subpath (see src/config.js).
+const qrSrc = withBase('/images/wh40k-app-qr.png')
 
 const labels = computed(() => ui[locale.value])
 

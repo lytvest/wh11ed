@@ -17,7 +17,7 @@
           >
             <img
               v-if="d.icon"
-              :src="d.icon"
+              :src="baseIcon(d.icon)"
               :alt="d.name"
               class="dispo-icon"
               loading="lazy"
@@ -35,7 +35,7 @@
           <th class="row-head">
             <img
               v-if="row.icon"
-              :src="row.icon"
+              :src="baseIcon(row.icon)"
               :alt="row.name"
               class="dispo-icon"
               loading="lazy"
@@ -63,6 +63,7 @@
 import { computed } from 'vue'
 import { ui } from '../../i18n/ui.js'
 import { useLocale } from '../../composables/useLocale.js'
+import { withBase } from '../../config.js'
 
 const props = defineProps({
   dispositions: { type: Array, required: true },
@@ -84,6 +85,11 @@ function isActive(rowId, colId) {
 }
 function isRecommended(rowId, colId) {
   return props.recommended && props.recommended.you === rowId && props.recommended.opp === colId
+}
+
+// Emblem icons are plain <img>, so the deployment base is applied here (see src/config.js).
+function baseIcon(icon) {
+  return icon ? withBase(icon) : icon
 }
 </script>
 

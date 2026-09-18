@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import { isStandaloneDisplay } from './standalone.js'
+import { withBase } from '../config.js'
 
 // Fill the offline caches with everything the app SHELL deliberately does not carry.
 //
@@ -46,13 +47,15 @@ let autoStarted = false
 let running = false
 
 async function manifest() {
-  const res = await fetch('/offline-manifest.json', { cache: 'no-store' })
+  const res = await fetch(withBase('/offline-manifest.json'), { cache: 'no-store' })
   if (!res.ok) throw new Error(`manifest ${res.status}`)
   const json = await res.json()
   bytes.value = (json.assets?.bytes || 0) + (json.images?.bytes || 0)
   // Assets first: they are the app itself, so a warm-up interrupted half-way still leaves every
   // screen reachable — it is the illustrations that go missing, not the rules.
-  return [...(json.assets?.files || []), ...(json.images?.files || [])]
+  // The manifest lists root-absolute paths (`/images/...`); prefix the deployment base so a
+  // subpath build warms its own files and not whatever the host serves at its root.
+  return [...(json.assets?.files || []), ...(json.images?.files || [])].map(withBase)
 }
 
 // `force` is the button: it warms again even when the marker says this exact set is already done,

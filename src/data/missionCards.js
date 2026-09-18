@@ -5,18 +5,22 @@
 // The card art is the deck background only: `mission.image` (the transcribed card scan) is not
 // used by the printed cards, exactly as in the source project.
 
-// One background per Force Disposition (primary decks) and per secondary deck.
+import { withBase } from '../config.js'
+
+// One background per Force Disposition (primary decks) and per secondary deck. `withBase` keeps
+// the URL inside the deployment's subpath (see src/config.js) — these are handed straight to a
+// CSS `background-image`, which Vite never rewrites.
 export const PRIMARY_DECK_IMAGES = {
-  'take-and-hold': '/images/missions/Take_and_Hold.webp',
-  'purge-the-foe': '/images/missions/Purge_the_Foe.webp',
-  reconnaissance: '/images/missions/Reconnaissance.webp',
-  'priority-assets': '/images/missions/Priority_Assets.webp',
-  disruption: '/images/missions/Disruption.webp',
+  'take-and-hold': withBase('/images/missions/Take_and_Hold.webp'),
+  'purge-the-foe': withBase('/images/missions/Purge_the_Foe.webp'),
+  reconnaissance: withBase('/images/missions/Reconnaissance.webp'),
+  'priority-assets': withBase('/images/missions/Priority_Assets.webp'),
+  disruption: withBase('/images/missions/Disruption.webp'),
 }
 
 export const SECONDARY_DECK_IMAGES = {
-  tactical: '/images/missions/tactical.webp',
-  fixed: '/images/missions/fixed.webp',
+  tactical: withBase('/images/missions/tactical.webp'),
+  fixed: withBase('/images/missions/fixed.webp'),
 }
 
 // Russian names of the five Force Dispositions, for the primary card's back. Mission and

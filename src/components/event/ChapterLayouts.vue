@@ -57,7 +57,7 @@
           >
             <img
               v-if="d.icon"
-              :src="d.icon"
+              :src="baseIcon(d.icon)"
               :alt="d.name"
               class="legend-icon"
             >
@@ -74,7 +74,7 @@
           >
             <img
               v-if="item.icon"
-              :src="item.icon"
+              :src="baseIcon(item.icon)"
               :alt="item.label"
               class="legend-icon"
             >
@@ -95,7 +95,7 @@
           >
             <img
               v-if="item.icon"
-              :src="item.icon"
+              :src="baseIcon(item.icon)"
               :alt="item.label"
               class="legend-icon"
             >
@@ -116,7 +116,7 @@
           >
             <span class="legend-label">{{ item.label }}</span>
             <img
-              :src="item.icon"
+              :src="baseIcon(item.icon)"
               :alt="item.label"
               class="edge-bar"
             >
@@ -129,7 +129,7 @@
             :key="item.id"
           >
             <img
-              :src="item.icon"
+              :src="baseIcon(item.icon)"
               :alt="item.label"
               class="legend-icon"
             >
@@ -226,6 +226,7 @@ import { ui } from '../../i18n/ui.js'
 import { useLocale } from '../../composables/useLocale.js'
 import { useRenderInline } from '../../composables/useRenderInline.js'
 import { getItem, setItem } from '../../composables/safeStorage.js'
+import { withBase } from '../../config.js'
 
 const { locale } = useLocale()
 const { renderInline } = useRenderInline()
@@ -280,7 +281,14 @@ function dispoName(id) {
 }
 
 function dispoIcon(id) {
-  return ec.value.dispositions.find(d => d.id === id)?.icon
+  const icon = ec.value.dispositions.find(d => d.id === id)?.icon
+  return icon ? withBase(icon) : icon
+}
+
+// Legend/emblem icons are plain <img> (not AppImage), so they need the deployment base applied
+// here — a root-absolute `/images/...` leaves a subpath build (see src/config.js).
+function baseIcon(icon) {
+  return icon ? withBase(icon) : icon
 }
 
 const matchup = computed(() => {

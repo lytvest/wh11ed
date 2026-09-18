@@ -51,7 +51,7 @@
           rel="noopener"
         >
           <img
-            src="/images/wh40k-app-qr.png"
+            :src="qrSrc"
             alt="QR code — Warhammer 40,000 App"
             class="qr-img"
           >
@@ -68,9 +68,13 @@ import { intro } from '../../data/intro.js'
 import { ui } from '../../i18n/ui.js'
 import { useLocale } from '../../composables/useLocale.js'
 import { useRenderInline } from '../../composables/useRenderInline.js'
+import { withBase } from '../../config.js'
 
 const { locale } = useLocale()
 const { renderInline } = useRenderInline()
+
+// Root-absolute in the template would leave the deployment's subpath (see src/config.js).
+const qrSrc = withBase('/images/wh40k-app-qr.png')
 
 const t = computed(() => intro[locale.value])
 const labels = computed(() => ui[locale.value])

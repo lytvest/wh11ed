@@ -60,7 +60,7 @@
         >
           <img
             v-if="d.icon"
-            :src="d.icon"
+            :src="baseIcon(d.icon)"
             :alt="d.name"
             class="chip-icon"
           >
@@ -167,6 +167,7 @@ import { eventCompanion, getEventContent } from '../../data/eventCompanion.js'
 import { ui } from '../../i18n/ui.js'
 import { useLocale } from '../../composables/useLocale.js'
 import { getItem, setItem } from '../../composables/safeStorage.js'
+import { withBase } from '../../config.js'
 
 const { locale } = useLocale()
 const labels = computed(() => ui[locale.value])
@@ -184,11 +185,16 @@ const data = computed(() => getMissions(locale.value))
 // Force Dispositions drive the primary grouping (id + English name + icon, language-agnostic).
 const dispositions = eventCompanion.en.dispositions
 
+// Emblem icons are plain <img>, so the deployment base is applied here (see src/config.js).
+function baseIcon(icon) {
+  return icon ? withBase(icon) : icon
+}
+
 const primaryGroups = computed(() =>
   dispositions.map(d => ({
     id: d.id,
     name: d.name,
-    icon: d.icon,
+    icon: withBase(d.icon),
     missions: data.value.primary.filter(m => m.deck === d.id),
   }))
 )

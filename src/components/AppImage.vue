@@ -19,6 +19,7 @@
 <script setup>
 import { computed } from 'vue'
 import imageDims from '../data/imageDimensions.js'
+import { withBase } from '../config.js'
 
 // Illustrations are stored as WebP (see scripts/gen-webp.mjs); data still references
 // the original `.jpg`/`.png` paths (and the runtime `-ru` suffix), so we map the
@@ -31,12 +32,14 @@ const props = defineProps({
 
 defineOptions({ inheritAttrs: false }) // forward class/style/width to the inner <img>
 
-const full = computed(() => props.src.replace(/\.(jpe?g|png|webp)$/i, '.webp'))
-const sm = computed(() => props.src.replace(/\.(jpe?g|png|webp)$/i, '-sm.webp'))
+// The dims table is keyed by the data path (`/images/...`), so look it up BEFORE prefixing the
+// deployment base — `withBase` only rewrites the URL actually handed to the browser.
+const full = computed(() => withBase(props.src.replace(/\.(jpe?g|png|webp)$/i, '.webp')))
+const sm = computed(() => withBase(props.src.replace(/\.(jpe?g|png|webp)$/i, '-sm.webp')))
 
 // Intrinsic [width, height] so the browser reserves space before the image loads
 // (prevents layout shift that would throw off anchor-scroll). Absent → no attrs set.
-const dims = computed(() => imageDims[full.value])
+const dims = computed(() => imageDims[props.src.replace(/\.(jpe?g|png|webp)$/i, '.webp')])
 </script>
 
 <style scoped>

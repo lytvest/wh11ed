@@ -27,6 +27,18 @@ export const BASE_URL = (() => {
   }
 })()
 
+// Prefix a root-absolute app path (`/images/...`, `/offline-manifest.json`) with the deployment
+// base. Data files and templates carry paths as `/images/...` — correct for the normal root
+// deployment, but on a subpath build (`/waha/`) an origin-absolute URL leaves the app and hits
+// whatever the host serves at its root. Every runtime URL built from such a path must go through
+// here; Vite only rewrites the URLs it can see at build time (imports, `url()` in CSS it processes),
+// not strings in data or template attributes. A path that is already absolute (`https://…`) or
+// relative is returned untouched.
+export function withBase(path) {
+  if (typeof path !== 'string' || !path.startsWith('/')) return path
+  return BASE_URL + path.slice(1)
+}
+
 // The domain the "we've moved" banner points visitors to. Deliberately a fixed constant, NOT
 // SITE_ORIGIN: the banner only shows on the old host, whose build self-canonicals to itself, so
 // reusing SITE_ORIGIN would advertise the old domain as the "new" one.

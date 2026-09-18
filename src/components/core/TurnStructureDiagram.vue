@@ -21,15 +21,25 @@
       <div
         class="turn-step-icon"
         :class="'turn-step-icon--' + step.icon"
+        :style="{ '--turn-icon': ICON_URLS[step.icon] }"
       />
     </div>
   </div>
 </template>
 
 <script setup>
+import { withBase } from '../../config.js'
+
 defineProps({
   steps: { type: Array, required: true },
 })
+
+// mask-image URLs must carry the deployment base (see src/config.js) — a scoped-CSS `url()`
+// pointing at a public/ file is left root-absolute by Vite, which leaves the subpath build.
+const ICON_URLS = Object.fromEntries(
+  ['turn-step', 'command', 'movement', 'shooting', 'charge', 'fight']
+    .map((key) => [key, `url(${withBase(`/images/turn/icon-${key}.webp`)})`]),
+)
 </script>
 
 <style scoped>
@@ -127,12 +137,12 @@ defineProps({
   mask-position: center;
 }
 
-.turn-step-icon--turn-step { -webkit-mask-image: url(/images/turn/icon-turn-step.webp); mask-image: url(/images/turn/icon-turn-step.webp); }
-.turn-step-icon--command { -webkit-mask-image: url(/images/turn/icon-command.webp); mask-image: url(/images/turn/icon-command.webp); }
-.turn-step-icon--movement { -webkit-mask-image: url(/images/turn/icon-movement.webp); mask-image: url(/images/turn/icon-movement.webp); }
-.turn-step-icon--shooting { -webkit-mask-image: url(/images/turn/icon-shooting.webp); mask-image: url(/images/turn/icon-shooting.webp); }
-.turn-step-icon--charge { -webkit-mask-image: url(/images/turn/icon-charge.webp); mask-image: url(/images/turn/icon-charge.webp); }
-.turn-step-icon--fight { -webkit-mask-image: url(/images/turn/icon-fight.webp); mask-image: url(/images/turn/icon-fight.webp); }
+.turn-step-icon--turn-step { -webkit-mask-image: var(--turn-icon); mask-image: var(--turn-icon); }
+.turn-step-icon--command { -webkit-mask-image: var(--turn-icon); mask-image: var(--turn-icon); }
+.turn-step-icon--movement { -webkit-mask-image: var(--turn-icon); mask-image: var(--turn-icon); }
+.turn-step-icon--shooting { -webkit-mask-image: var(--turn-icon); mask-image: var(--turn-icon); }
+.turn-step-icon--charge { -webkit-mask-image: var(--turn-icon); mask-image: var(--turn-icon); }
+.turn-step-icon--fight { -webkit-mask-image: var(--turn-icon); mask-image: var(--turn-icon); }
 
 @media (max-width: 560px) {
   .turn-step {
