@@ -86,6 +86,13 @@ const ROUTES = {
       ru: 'Основные правила, Event Companion и Combat Patrol — весь контент правил Warhammer 40,000 11-й редакции в одном месте.',
     },
   },
+  '/missions-print': {
+    title: { en: 'Mission Cards for Print', ru: 'Карточки миссий для печати' },
+    description: {
+      en: 'Every primary and secondary mission of Warhammer 40,000 11th edition as a printable card — front and back in the deck\'s own artwork, each face downloadable as a PNG to print and cut out.',
+      ru: 'Все основные и вторичные миссии Warhammer 40,000 11-й редакции в виде печатных карточек — лицо и рубашка в оформлении колоды, каждую сторону можно скачать как PNG и распечатать.',
+    },
+  },
   '/combat-patrol': {
     title: { en: 'Combat Patrol', ru: 'Combat Patrol' },
     description: {

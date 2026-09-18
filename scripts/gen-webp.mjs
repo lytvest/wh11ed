@@ -48,6 +48,11 @@ function iconSpec(absPath) {
   // Battle-round turn-structure icons (see TurnStructureDiagram.vue) — flat monochrome
   // shapes rendered via CSS mask-image, so they need alpha, not a -sm variant.
   if (name.startsWith('icon-')) return { maxWidth: 200, lossless: true }
+  // Mission-deck card backgrounds (public/images/missions/, used by the printable mission
+  // cards). They are 1536×2688 portrait art drawn at card size; a single ~1024-wide webp is
+  // plenty for both the on-screen card and the 1024px PNG export, and the -sm variant would
+  // be dead weight (the cards are never rendered at phone-illustration widths).
+  if (rel(absPath).startsWith('missions/')) return { maxWidth: 1024, lossless: false }
   // wh40k-app-qr.png is left as-is: the original is a tiny (~4KB) crisp b/w PNG;
   // downscaling + webp made it larger and softer (bad for scanning).
   return null

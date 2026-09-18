@@ -37,6 +37,7 @@ const FactionDatasheetsView  = () => import('../views/faction/FactionDatasheetsV
 const FactionDatasheetView   = () => import('../views/faction/FactionDatasheetView.vue')
 const FactionFaqView         = () => import('../views/faction/FactionFaqView.vue')
 const RulesLandingView  = () => import('../views/RulesLandingView.vue')
+const MissionsPrintView = () => import('../views/MissionsPrintView.vue')
 const CombatPatrolIndexView  = () => import('../views/combat-patrol/CombatPatrolIndexView.vue')
 const CombatPatrolFactionView = () => import('../views/combat-patrol/CombatPatrolFactionView.vue')
 const NotFoundView      = () => import('../views/NotFoundView.vue')
@@ -458,6 +459,9 @@ const localeRoutes = [
     { path: '/factions/:slug/faq',         component: FactionFaqView, meta: { section: 'faction' } },
     // "Rules" umbrella landing (Core Rules / Event Companion / Combat Patrol summary cards).
     { path: '/rules', component: RulesLandingView, meta: { section: 'rules-landing' } },
+    // Printable mission cards — a gallery of every primary/secondary mission as a card pair
+    // with a PNG download. Public and indexable (in STATIC_ROUTES), reached from the landing.
+    { path: '/missions-print', component: MissionsPrintView, meta: { section: 'missions-print' } },
     // Combat Patrol.
     { path: '/combat-patrol',       component: CombatPatrolIndexView, meta: { section: 'combat-patrol' } },
     { path: '/combat-patrol/:slug', component: CombatPatrolFactionView, meta: { section: 'combat-patrol' } },

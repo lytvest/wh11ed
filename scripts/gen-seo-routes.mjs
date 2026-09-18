@@ -44,6 +44,7 @@ const STATIC_ROUTES = [
   '/core-rules',
   '/event-companion',
   '/rules',
+  '/missions-print',
   '/tracker',
   '/roster',
   '/stratagems',

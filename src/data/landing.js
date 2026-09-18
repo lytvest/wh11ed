@@ -35,6 +35,13 @@ export const landing = {
         desc: 'Run the game itself: missions, secondaries, command points and per-round scoring for both players — and, with a roster loaded, your army\'s own rules applied live, so a unit\'s card shows what its detachment rule, auras and stratagems are doing to it right now.',
       },
       {
+        key: 'missions-print',
+        label: 'For print',
+        path: '/missions-print',
+        badge: 'Printable cards',
+        desc: 'Every primary and secondary mission as a card you can print and cut out — front and back, in the deck\'s own artwork, each face downloadable as a PNG.',
+      },
+      {
         key: 'links',
         label: 'Links',
         path: '/links',
@@ -104,6 +111,13 @@ export const landing = {
         path: '/tracker',
         badge: 'Трекер и стратагемы',
         desc: 'Ведите саму партию: миссии, вторичные задачи, командные очки и подсчёт по раундам за обоих игроков — а с загруженным ростером ещё и правила вашей армии применяются вживую, и на карточке юнита видно, что с ним прямо сейчас делают правило детачмента, ауры и стратагемы.',
+      },
+      {
+        key: 'missions-print',
+        label: 'Для печати',
+        path: '/missions-print',
+        badge: 'Печатные карточки',
+        desc: 'Все основные и вторичные миссии в виде карточек, которые можно распечатать и вырезать — лицо и рубашка, в оформлении своей колоды, каждую сторону можно скачать как PNG.',
       },
       {
         key: 'links',

@@ -27,4 +27,13 @@ import '@fontsource/sofia-sans-extra-condensed/600.css'
 import '@fontsource/sofia-sans-extra-condensed/700.css'
 import '@fontsource/sofia-sans-extra-condensed/800.css'
 
+// Roboto Condensed is used ONLY by the printable mission cards (/missions-print), which are
+// ported from the standalone card project and must keep its typography. 400 + 700 (+ italics)
+// is all the card CSS asks for; the family is named explicitly in that component, so it never
+// leaks into the rest of the app.
+import '@fontsource/roboto-condensed/400.css'
+import '@fontsource/roboto-condensed/400-italic.css'
+import '@fontsource/roboto-condensed/700.css'
+import '@fontsource/roboto-condensed/700-italic.css'
+
 import 'bootstrap-icons/font/bootstrap-icons.css'

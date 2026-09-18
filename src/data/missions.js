@@ -1487,3 +1487,26 @@ export function getMissions(locale) {
     secondary: en.secondary.map(m => localizeMission(m, m.role)),
   }
 }
+
+// The same secondary mission exists once per role (attacker / defender); only the role label
+// differs, the card text is identical. Collapse the pairs into a single role-agnostic entry
+// (`roles: [...]`) so a reference page does not show duplicates.
+//
+// Deliberately NOT applied to `en`/`getMissions` above: the tracker's `secondaryPool(role)`
+// filters on the single `role` field and `missions.secondary-parity.test.js` asserts one entry
+// per role, so the stored shape must keep them apart. Only the printable-card gallery, which
+// wants one card per mission, calls this.
+export function dedupeSecondaries(list) {
+  const bySlug = new Map()
+  const order = []
+  for (const m of list) {
+    if (!bySlug.has(m.slug)) {
+      bySlug.set(m.slug, { ...m, roles: [m.role] })
+      order.push(m.slug)
+    } else {
+      const entry = bySlug.get(m.slug)
+      if (!entry.roles.includes(m.role)) entry.roles.push(m.role)
+    }
+  }
+  return order.map(slug => bySlug.get(slug))
+}
