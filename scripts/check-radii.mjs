@@ -25,6 +25,9 @@ const ALLOWED = [
   { file: 'src/style.css', value: '3px', why: 'scrollbar thumb — OS chrome, not our surface' },
   { file: 'src/components/SearchModal.vue', value: '2px', why: 'search-hit highlight behind text' },
   { file: 'src/components/BaseModal.vue', value: '12px 12px 0 0', why: 'mobile bottom sheet — the round top edge is what says it slid up' },
+  { file: 'src/components/missions/MissionCardFace.vue', value: '8px', why: 'printable mission card — a physical card has rounded corners, and it is exported to PNG as one' },
+  { file: 'src/components/missions/MissionCardFace.vue', value: '4px', why: 'the fixed/tactical tag on a mission card, matching the card art it sits on' },
+  { file: 'src/components/missions/MissionCardTile.vue', value: '10px', why: 'the mission card download button, matching the card it exports' },
 ]
 
 const files = []

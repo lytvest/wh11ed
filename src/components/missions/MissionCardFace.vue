@@ -244,6 +244,12 @@ function vpLabel(vp) {
 .card {
   --card-pad: calc(16px * var(--card-scale));
   --card-gap: calc(10px * var(--card-scale));
+  /* The standalone card project's palette, scoped to the card so it never leaks into the app
+     (which has no --card-* tokens of its own). */
+  --card-blue: #4a90d9;
+  --card-navy: #1a3a5c;
+  --card-burgundy: #8b2a2a;
+  --card-gold: #9e7624;
   --card-accent: var(--card-blue);
   --card-accent-dark: var(--card-navy);
   --card-accent-light: #87ceeb;
@@ -256,6 +262,7 @@ function vpLabel(vp) {
   padding: 0;
   background: #fff;
   border: 1px solid #b0b0b0;
+  border-radius: 8px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25), 0 5px 15px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   color: #333;
@@ -593,6 +600,7 @@ function vpLabel(vp) {
   text-transform: uppercase;
   letter-spacing: 0.6px;
   padding: calc(2px * var(--card-scale)) calc(6px * var(--card-scale));
+  border-radius: 4px;
   font-weight: 700;
   white-space: nowrap;
 }

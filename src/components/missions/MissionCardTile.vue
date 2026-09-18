@@ -125,6 +125,7 @@ async function download(side) {
   width: 100%;
   padding: 10px 16px;
   border: 1px solid var(--border);
+  border-radius: 10px;
   background: var(--bg-card);
   color: var(--text-primary);
   font: inherit;
