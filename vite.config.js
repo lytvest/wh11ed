@@ -159,7 +159,7 @@ export default defineConfig({
         // The manifest's URL fields are NOT base-prefixed by Vite (unlike the icon `src`s,
         // which the PWA plugin rewrites), so they are built from VITE_BASE here. Must match
         // the build's `base` exactly, or an installed app launches at the origin root —
-        // which, on the shared sveta-disk.ru host, is somebody else's site.
+        // which, on a shared example.site host, is somebody else's site.
         id: BASE,
         name: 'Warhammer 40,000 11th Edition — Rules, Rosters & Game Tracker',
         // Shown under the installed icon — this is the app's user-facing name. Keep it short

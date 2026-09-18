@@ -34,6 +34,6 @@ MODIFIER-QUEUE.local.json
 # (vite precaches **/*.html); deploy.sh uploads it as bucket keys.
 seo-html/
 
-# Local deploy helper for the sveta-disk.ru/waha/ subpath build — machine-specific (hardcodes
+# Local deploy helper for the example.site/waha/ subpath build — machine-specific (hardcodes
 # paths and the nginx site), so it stays out of the repo like the .local files above.
 my_deploy.sh
