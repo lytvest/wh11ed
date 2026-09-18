@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LandingView from '../views/LandingView.vue'
+import { BASE_URL } from '../config.js'
 import { isStandaloneDisplay } from '../composables/standalone.js'
 import { combatPatrolIndex } from '../data/combatPatrolIndex.js'
 import { LOCALE_SEGMENT, localePath, stripLocale } from './locale.js'
@@ -466,7 +467,12 @@ const localeRoutes = [
 ]
 
 export const router = createRouter({
-  history: createWebHistory(),
+  // The app's own base path. Without it vue-router defaults to `/`, so every RouterLink and every
+  // navigation would drop a deployment's subpath prefix (`/waha/rules` → `/rules`) and, on a host
+  // shared with another site at the root, send the reader somewhere else entirely. `BASE_URL` is
+  // Vite's value for the build's `base`, so `--base=/waha/` fixes links, asset URLs and the PWA
+  // manifest at once.
+  history: createWebHistory(BASE_URL),
   routes: [
     ...localeRoutes.map(withLocale),
     // Catch-all 404. The bucket's ErrorDocument serves index.html (HTTP 404) for any

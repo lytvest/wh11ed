@@ -9,6 +9,24 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localho
 // (VITE_SITE_ORIGIN in deploy.sh / .env.deploy) — the retired wh11ed.ru is frozen, not rebuilt.
 export const SITE_ORIGIN = import.meta.env.VITE_SITE_ORIGIN || 'https://wh-rules.ru'
 
+// The path the app is served under, WITH a trailing slash — always `/` for the normal
+// root deployment, `/waha/` when a build is dropped into a subpath of a shared host.
+//
+// `import.meta.env.BASE_URL` is Vite's own value, so `vite build --base=/waha/` (or VITE_BASE)
+// is the single switch: assets, the PWA manifest and this are all derived from it and cannot
+// disagree. A build-time absolute base (`https://host/waha/`) is reduced to its pathname —
+// vue-router and every URL built as `BASE + path` want a path, not an origin. The trailing slash
+// matters: createWebHistory stores the base without it and `BASE + path` concatenation needs it.
+export const BASE_URL = (() => {
+  const raw = import.meta.env.BASE_URL || '/'
+  try {
+    const p = new URL(raw, 'http://vite.local').pathname
+    return p.endsWith('/') ? p : p + '/'
+  } catch {
+    return '/'
+  }
+})()
+
 // The domain the "we've moved" banner points visitors to. Deliberately a fixed constant, NOT
 // SITE_ORIGIN: the banner only shows on the old host, whose build self-canonicals to itself, so
 // reusing SITE_ORIGIN would advertise the old domain as the "new" one.

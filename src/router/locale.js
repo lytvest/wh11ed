@@ -21,9 +21,39 @@ export const RU_PREFIX = '/ru'
  *  `/roster/:id` and that an unknown `/ru/...` still falls through to the catch-all. */
 export const LOCALE_SEGMENT = '/:lang(ru)?'
 
-/** 'ru' for a path under the RU prefix, 'en' otherwise. */
+/** The app's own base PATH (`/` normally, `/waha/` when deployed into a subpath), origin
+ *  stripped. `import.meta.env.BASE_URL` is Vite's value for the build's `base`, so it always
+ *  matches the emitted asset URLs and the router's `createWebHistory(base)`; a build-time
+ *  absolute base (`https://host/waha/`) is normalised to its pathname here, because the only
+ *  things that read this are path operations. Defaults to `/` when there is no Vite env
+ *  (a plain Node import by `scripts/gen-seo-routes.mjs`) or no base at all. */
+export const APP_BASE = (() => {
+  const raw = (import.meta.env && import.meta.env.BASE_URL) || '/'
+  try {
+    // Keep only the path, so `https://host/waha/` and `/waha/` behave identically.
+    const p = new URL(raw, 'http://vite.local').pathname
+    return p.endsWith('/') ? p : p + '/'
+  } catch {
+    return '/'
+  }
+})()
+
+/** Strip the deployment base off a raw `location.pathname`. vue-router's own `route.path` is
+ *  already base-free, so this is only for the few places that read the browser's pathname
+ *  directly — the locale singleton at boot. Without it, a build under `/waha/` sees
+ *  `/waha/ru/rules` and never finds the locale prefix. No-ops on a root deployment. */
+export function stripBase(path) {
+  if (APP_BASE === '/') return path
+  const bare = APP_BASE.slice(0, -1) // '/waha/'
+  if (path === bare) return '/'
+  return path.startsWith(APP_BASE) ? path.slice(bare.length) : path
+}
+
+/** 'ru' for a path under the RU prefix, 'en' otherwise. Accepts a raw `location.pathname`
+ *  (base included) as well as a router path — `stripBase` no-ops on the root deployment. */
 export function localeOfPath(path) {
-  return path === RU_PREFIX || (path || '').startsWith(RU_PREFIX + '/') ? 'ru' : 'en'
+  const p = stripBase(path)
+  return p === RU_PREFIX || (p || '').startsWith(RU_PREFIX + '/') ? 'ru' : 'en'
 }
 
 /** `/ru/rules` → `/rules`, `/ru` → `/`. A path with no prefix is returned unchanged, so this is

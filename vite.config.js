@@ -12,6 +12,11 @@ const pkgVersion = JSON.parse(readFileSync('./package.json', 'utf8')).version
 // tags — no hand-editing index.html/robots at the domain cutover.
 const SITE_ORIGIN = process.env.VITE_SITE_ORIGIN || 'https://wh-rules.ru'
 
+// The app's base path, read from the same env the build reads (`vite build --base=…` /
+// VITE_BASE) so the manifest's start_url/scope and nginx can never disagree with the
+// emitted asset URLs. Default is the project's own root deployment.
+const BASE = process.env.VITE_BASE || '/'
+
 // Replace the %SITE_ORIGIN% placeholder in index.html at build time. Not Vite's built-in
 // %VITE_*% mechanism, so we control the fallback (a bare `npm run build` with no env still emits
 // a valid absolute origin instead of an empty string).
@@ -132,7 +137,7 @@ function offlineShell() {
 }
 
 export default defineConfig({
-  base: '/',
+  base: BASE,
   define: {
     __APP_VERSION__: JSON.stringify(pkgVersion),
   },
@@ -150,7 +155,12 @@ export default defineConfig({
       manifest: {
         // Explicit `id` keeps the app identity stable across deploys even if
         // start_url ever changes (avoids duplicate installs).
-        id: '/',
+        //
+        // The manifest's URL fields are NOT base-prefixed by Vite (unlike the icon `src`s,
+        // which the PWA plugin rewrites), so they are built from VITE_BASE here. Must match
+        // the build's `base` exactly, or an installed app launches at the origin root —
+        // which, on the shared sveta-disk.ru host, is somebody else's site.
+        id: BASE,
         name: 'Warhammer 40,000 11th Edition — Rules, Rosters & Game Tracker',
         // Shown under the installed icon — this is the app's user-facing name. Keep it short
         // enough not to be truncated on a phone home screen (~12 chars).
@@ -159,8 +169,8 @@ export default defineConfig({
           'A bilingual (EN/RU) app for playing Warhammer 40,000 11th Edition: core rules and the Event Companion, faction rules and unit datasheets, an army list builder, and a game tracker that applies your army\'s own rules. Works fully offline, no account needed.',
         lang: 'en',
         dir: 'ltr',
-        start_url: '/',
-        scope: '/',
+        start_url: BASE,
+        scope: BASE,
         display: 'standalone',
         theme_color: '#242428',
         background_color: '#242428',
