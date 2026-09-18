@@ -50,6 +50,9 @@ const busy = reactive({ front: false, back: false })
 // 1024px wide is the source project's export size — enough for a crisp printed card.
 const PNG_WIDTH = 1024
 
+// Must match `.card`'s border-radius in MissionCardFace.vue (also listed in check-radii.mjs).
+const CARD_RADIUS = 8
+
 function slugify(value) {
   return value
     .toLowerCase()
@@ -67,23 +70,59 @@ async function waitForExportLayout() {
   await nextFrame()
 }
 
+// modern-screenshot rasterizes the node into an SVG <foreignObject> and does NOT clip the root
+// element's border-radius, so an exported card would come out with square corners (and, with a
+// background color set, a white line along the edge left by the fractional box). The PNG is
+// therefore re-clipped here: draw the raw export onto a canvas through a rounded-rect path, which
+// is what the on-screen card actually looks like. Canvas roundRect() is Safari 16.4+, above the
+// app's 16.2 floor, so the path is built with arcTo instead.
+function clipToRoundedCard(dataUrl, width, height, radius) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+      const ctx = canvas.getContext('2d')
+      // Scale the CSS-pixel radius up to the exported pixel size.
+      const r = radius * (img.width / width)
+      ctx.beginPath()
+      ctx.moveTo(r, 0)
+      ctx.arcTo(img.width, 0, img.width, img.height, r)
+      ctx.arcTo(img.width, img.height, 0, img.height, r)
+      ctx.arcTo(0, img.height, 0, 0, r)
+      ctx.arcTo(0, 0, img.width, 0, r)
+      ctx.closePath()
+      ctx.clip()
+      ctx.drawImage(img, 0, 0)
+      resolve(canvas.toDataURL('image/png'))
+    }
+    img.onerror = reject
+    img.src = dataUrl
+  })
+}
+
 async function download(side) {
   const node = faceRefs[side]?.cardRef
   if (!node || busy[side]) return
   busy[side] = true
   try {
     await waitForExportLayout()
-    const { width, height } = node.getBoundingClientRect()
-    const dataUrl = await domToPng(node, {
+    // Round to whole pixels so the clone and the canvas agree — a fractional box leaves a
+    // sub-pixel sliver where the background bleeds through as a white edge line.
+    const rect = node.getBoundingClientRect()
+    const width = Math.round(rect.width)
+    const height = Math.round(rect.height)
+    const square = await domToPng(node, {
       width,
       height,
       scale: PNG_WIDTH / width,
-      backgroundColor: '#ffffff',
       style: {
         width: `${width}px`,
         height: `${height}px`,
       },
     })
+    const dataUrl = await clipToRoundedCard(square, width, height, CARD_RADIUS)
     const role = props.mission.role || (props.mission.roles && props.mission.roles[0])
     const rolePart = role ? `-${role}` : ''
     const deck = props.mission.sideDeck ? `-${props.mission.sideDeck}` : ''
