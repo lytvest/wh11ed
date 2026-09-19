@@ -261,7 +261,6 @@ function vpLabel(vp) {
   gap: 0;
   padding: 0;
   background: #fff;
-  border: 1px solid #b0b0b0;
   border-radius: 8px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25), 0 5px 15px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -269,6 +268,9 @@ function vpLabel(vp) {
   font-family: 'Roboto Condensed', 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
+/* The full-bleed layers (art, scrim, the ::after tints) reach the card's outer edge. The card
+   has no border — a 1px frame here is magnified to a visible line in the 1024px PNG export, so
+   the art is what meets the rounded clip instead. */
 .card-bg {
   position: absolute;
   inset: 0;
@@ -450,8 +452,6 @@ function vpLabel(vp) {
 .card--primary.card--back .card-back-lore {
   color: #d2dbe5;
 }
-.card--deck-tactical.card--back { border-color: #1f6d85; }
-.card--deck-fixed.card--back { border-color: #6b3fb8; }
 
 .card-back {
   flex: 1;
