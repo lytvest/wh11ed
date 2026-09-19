@@ -23,9 +23,9 @@ export const SECONDARY_DECK_IMAGES = {
   fixed: withBase('/images/missions/fixed.webp'),
 }
 
-// Russian names of the five Force Dispositions, for the primary card's back. Mission and
-// disposition names stay English on the page (project convention — see src/data/CLAUDE.md);
-// this is the printed card's own translation, as in the source project.
+// Russian names of the five Force Dispositions, for the printed card's own translation (RU only).
+// Mission and disposition names stay English on the reference page (project convention — see
+// src/data/CLAUDE.md); dispositionLabel() picks the right map for the active locale.
 export const DISPOSITION_BY_SLUG = {
   'take-and-hold': 'Захватить и удержать',
   'purge-the-foe': 'Истребить врага',
@@ -47,10 +47,45 @@ export function dispositionRu(deckOrName) {
   return DISPOSITION_BY_SLUG[deckOrName] || DISPOSITION_BY_NAME[deckOrName] || deckOrName
 }
 
-// The secondary card back is a stamp: the deck's Russian name, split over two lines.
+// The English display name of a Force Disposition. The deck id is already the English name in
+// slug form ('take-and-hold'), but the card must print the title-case spelling ('Take and Hold'),
+// so keep a map rather than re-slugging on the fly.
+export const DISPOSITION_EN = {
+  'take-and-hold': 'Take and Hold',
+  'purge-the-foe': 'Purge the Foe',
+  reconnaissance: 'Reconnaissance',
+  'priority-assets': 'Priority Assets',
+  disruption: 'Disruption',
+}
+
+// Locale-aware disposition label for the printed card faces. RU gets the source project's own
+// translation; EN prints the English name — the gallery page is bilingual, and an English reader
+// must not get Russian stamped on their cards.
+export function dispositionLabel(deckOrName, locale) {
+  if (locale === 'ru') return dispositionRu(deckOrName)
+  return DISPOSITION_EN[deckOrName] || DISPOSITION_BY_NAME[deckOrName] || deckOrName
+}
+
+// The secondary card back is a stamp: the deck's name, split over two lines.
 export const SIDE_DECK_LABEL = {
   tactical: 'Тактическая миссия',
   fixed: 'Фиксированная миссия',
+}
+
+export const SIDE_DECK_LABEL_EN = {
+  tactical: 'Tactical Mission',
+  fixed: 'Fixed Mission',
+}
+
+// Short deck tag printed beside a secondary block's heading ('такт.' / 'фикс.' in RU).
+export const SIDE_DECK_TAG = {
+  tactical: 'такт.',
+  fixed: 'фикс.',
+}
+
+export const SIDE_DECK_TAG_EN = {
+  tactical: 'tact.',
+  fixed: 'fix.',
 }
 
 // A secondary mission's blocks carry a `kind` ('tactical' | 'fixed'); the same mission can

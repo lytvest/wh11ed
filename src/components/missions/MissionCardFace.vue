@@ -33,19 +33,19 @@
       >
         <div class="card-back-matchup">
           <div class="card-back-type">
-            {{ dispositionRu(mission.deck) }}
+            {{ dispositionLabel(mission.deck, locale) }}
           </div>
           <div class="card-back-vs">
             {{ labels.missionCardsAgainst }}
           </div>
           <div class="card-back-type">
-            {{ dispositionRu(mission.opponent) }}
+            {{ dispositionLabel(mission.opponent, locale) }}
           </div>
         </div>
         <div class="card-back-name">
-          <h3>{{ mission.nameRu || mission.name }}</h3>
+          <h3>{{ displayName }}</h3>
           <div
-            v-if="mission.nameRu"
+            v-if="locale === 'ru' && mission.nameRu"
             class="card-back-name-en"
           >
             {{ mission.name }}
@@ -73,10 +73,10 @@
           />
           <div class="header-text">
             <h3 class="card-name">
-              {{ mission.nameRu || mission.name }}
+              {{ displayName }}
             </h3>
             <div
-              v-if="mission.nameRu"
+              v-if="locale === 'ru' && mission.nameRu"
               class="card-name-en"
             >
               {{ mission.name }}
@@ -134,7 +134,7 @@
                 class="block-kind"
                 :class="`block-kind--${block.kind}`"
               >
-                {{ block.kind === 'fixed' ? 'фикс.' : 'такт.' }}
+                {{ deckTag(block.kind) }}
               </span>
               <span class="block-heading">{{ block.heading }}</span>
             </header>
@@ -187,7 +187,10 @@ import {
   PRIMARY_DECK_IMAGES,
   SECONDARY_DECK_IMAGES,
   SIDE_DECK_LABEL,
-  dispositionRu,
+  SIDE_DECK_LABEL_EN,
+  SIDE_DECK_TAG,
+  SIDE_DECK_TAG_EN,
+  dispositionLabel,
 } from '../../data/missionCards.js'
 
 const props = defineProps({
@@ -199,6 +202,18 @@ const { locale } = useLocale()
 const labels = computed(() => ui[locale.value])
 
 const role = computed(() => props.mission.role || (props.mission.roles && props.mission.roles[0]))
+
+// The card prints the localized name on top with the English original as a subline — but only in
+// RU. In EN the card is English throughout: the original name was already the display name, and
+// a `nameRu` subline under it would be Russian text on an otherwise English card.
+const displayName = computed(() =>
+  locale.value === 'ru' ? (props.mission.nameRu || props.mission.name) : props.mission.name,
+)
+
+function deckTag(kind) {
+  const map = locale.value === 'ru' ? SIDE_DECK_TAG : SIDE_DECK_TAG_EN
+  return map[kind] || ''
+}
 
 const { cardRef, bodyRef } = useFitText([
   toRef(props, 'mission'),
@@ -223,7 +238,8 @@ const cardClass = computed(() => {
 })
 
 const stamp = computed(() => {
-  const label = SIDE_DECK_LABEL[props.mission.sideDeck] || SIDE_DECK_LABEL.tactical
+  const map = locale.value === 'ru' ? SIDE_DECK_LABEL : SIDE_DECK_LABEL_EN
+  const label = map[props.mission.sideDeck] || map.tactical
   const [first, ...rest] = label.split(' ')
   return { first, rest: rest.join(' ') }
 })

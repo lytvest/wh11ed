@@ -34,7 +34,7 @@
             :key="d"
             :value="d"
           >
-            {{ dispositionRu(d) }}
+            {{ dispositionLabel(d, locale) }}
           </option>
         </select>
       </template>
@@ -105,7 +105,7 @@
 import { computed, ref } from 'vue'
 import MissionCardTile from '../components/missions/MissionCardTile.vue'
 import { getMissions, dedupeSecondaries } from '../data/missions.js'
-import { expandSecondaries, dispositionRu } from '../data/missionCards.js'
+import { expandSecondaries, dispositionLabel } from '../data/missionCards.js'
 import { ui } from '../i18n/ui.js'
 import { useLocale } from '../composables/useLocale.js'
 
