@@ -60,10 +60,12 @@ export const DISPOSITION_EN = {
 
 // Locale-aware disposition label for the printed card faces. RU gets the source project's own
 // translation; EN prints the English name — the gallery page is bilingual, and an English reader
-// must not get Russian stamped on their cards.
+// must not get Russian stamped on their cards. Callers pass either a deck slug ('disruption') or
+// the English name ('Disruption'); both resolve to the English name unchanged in EN, while in RU
+// DISPOSITION_BY_NAME is the name→Russian bridge.
 export function dispositionLabel(deckOrName, locale) {
   if (locale === 'ru') return dispositionRu(deckOrName)
-  return DISPOSITION_EN[deckOrName] || DISPOSITION_BY_NAME[deckOrName] || deckOrName
+  return DISPOSITION_EN[deckOrName] || deckOrName
 }
 
 // The secondary card back is a stamp: the deck's name, split over two lines.
