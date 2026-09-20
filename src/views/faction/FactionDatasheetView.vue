@@ -1,29 +1,31 @@
 <template>
   <FactionLayout :hero="false">
     <section class="fsection">
-      <template v-if="sheet">
+      <!-- One container for the plate and the card: the card bleeds to the screen edge by its
+           OWN width (DatasheetCard's dscard container, ≤480px), and the plate has to bleed on
+           exactly the same condition — a viewport query put the two out of step by the page
+           gutter, and a window ~500px wide showed an inset plate over a full-bleed card. -->
+      <div
+        v-if="sheet"
+        class="ds-page"
+      >
         <div class="ds-head">
+          <!-- No Legends mark up here: the name plate is the first thing on a phone's screen and
+               anything beside the name either wrapped the name or took a row. The badge sits in
+               the statline's spare space instead (DatasheetCard). -->
           <h2 class="ds-title">
             {{ sheet.name }} <span
               v-if="sheet.baseSize"
               class="ds-title-base"
             >({{ fmtBase(sheet.baseSize) }})</span>
           </h2>
-          <!-- A reader who followed a link straight here has to be told the same thing the grid's
-               badge says: the rules below are published, the unit is not matched-play legal. -->
-          <p
-            v-if="sheet.legends"
-            class="ds-legends-note"
-          >
-            <strong class="legends-badge">{{ labels.dsLegends }}</strong> {{ labels.dsLegendsNote }}
-          </p>
           <div class="ds-actions">
             <button
               type="button"
               class="ds-btn"
               :class="{ 'ds-btn-pin-on': fav }"
-              :title="fav ? labels.favUnpin : labels.favPin"
-              :aria-label="fav ? labels.favUnpin : labels.favPin"
+              :title="fav ? labels.dsUnpinUnit : labels.dsPinUnit"
+              :aria-label="fav ? labels.dsUnpinUnit : labels.dsPinUnit"
               :aria-pressed="fav"
               @click="toggleUnitFavorite(route.params.slug, sheet.id)"
             >
@@ -75,6 +77,20 @@
             >
               <i class="bi bi-image" />
             </a>
+            <!-- On a phone the five buttons above fold into this one (the container query below
+                 swaps them): five 30px squares beside a name like "Kill Team Cassius" left the name
+                 two words to a line (a screenshot, 2026-09-19). The sheet it opens is the same
+                 .act-list every "…" in the app opens, the actions unchanged. -->
+            <button
+              ref="moreBtn"
+              type="button"
+              class="ds-btn ds-more"
+              :title="labels.rosterMoreActions"
+              :aria-label="labels.rosterMoreActions"
+              @click="moreOpen = true"
+            >
+              <i class="bi bi-three-dots" />
+            </button>
           </div>
         </div>
         <DatasheetCard
@@ -86,7 +102,7 @@
           keyword-links-enabled
           @keyword-click="activeKeyword = $event"
         />
-      </template>
+      </div>
       <p
         v-else-if="loaded"
         class="ds-missing"
@@ -94,6 +110,50 @@
         {{ labels.factionsSoon }}
       </p>
     </section>
+
+    <BaseModal
+      v-if="moreOpen && sheet"
+      :title="sheet.name"
+      max-width="340px"
+      @close="moreOpen = false"
+    >
+      <div class="modal-body act-list">
+        <button
+          class="act-btn ds-act"
+          @click="moreDo(() => toggleUnitFavorite(route.params.slug, sheet.id))"
+        >
+          <i :class="fav ? 'bi bi-pin-angle-fill' : 'bi bi-pin-angle'" />{{ fav ? labels.dsUnpinUnit : labels.dsPinUnit }}
+        </button>
+        <button
+          class="act-btn ds-act"
+          @click="moreDo(() => toggleOwned(route.params.slug, sheet.id, sheet.name))"
+        >
+          <i :class="owned ? 'bi bi-star-fill' : 'bi bi-star'" />{{ owned ? labels.dsOwnRemove : labels.dsOwnAdd }}
+        </button>
+        <button
+          class="act-btn ds-act"
+          @click="moreDo(copyName)"
+        >
+          <i class="bi bi-clipboard" />{{ labels.dsCopyName }}
+        </button>
+        <button
+          v-if="sheet.flavor"
+          class="act-btn ds-act"
+          @click="moreDo(openLoreFromSheet)"
+        >
+          <i class="bi bi-book" />{{ labels.loreShow }}
+        </button>
+        <a
+          :href="imageUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="act-btn ds-act"
+          @click="moreOpen = false"
+        >
+          <i class="bi bi-image" />{{ labels.dsSearchImage }}
+        </a>
+      </div>
+    </BaseModal>
 
     <KeywordUnitsModal
       v-if="activeKeyword"
@@ -135,6 +195,7 @@
 import { computed, ref, watch, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import DatasheetCard from '../../components/DatasheetCard.vue'
+import BaseModal from '../../components/BaseModal.vue'
 import FactionLayout from '../../components/FactionLayout.vue'
 import KeywordUnitsModal from '../../components/KeywordUnitsModal.vue'
 import { unitsWithKeyword } from '../../utils/keywordUnits.js'
@@ -287,10 +348,22 @@ function toggleLorePopover(e) {
 }
 function closeLore() { loreOpen.value = false }
 
+// The phone-width "…" sheet. Every action closes the sheet first; the lore popover is then
+// anchored to the "…" button itself — the book button it usually hangs off is display:none at
+// that width — and opened on the next tick, after the sheet's own click has finished bubbling
+// (the document click that dismisses the popover is attached while that click is still in flight).
+const moreOpen = ref(false)
+const moreBtn = ref(null)
+function moreDo(fn) { moreOpen.value = false; fn() }
+function openLoreFromSheet() {
+  const rect = moreBtn.value?.getBoundingClientRect()
+  setTimeout(() => { loreAnchor.value = rect || null; loreOpen.value = true }, 0)
+}
+
 function dismissOnMove() { if (loreOpen.value) closeLore() }
 function onKeydown(e) { if (e.key === 'Escape') closeLore() }
 function onDocClick(e) {
-  if (lorePopEl.value?.contains(e.target) || loreBtn.value?.contains(e.target)) return
+  if (lorePopEl.value?.contains(e.target) || loreBtn.value?.contains(e.target) || moreBtn.value?.contains(e.target)) return
   closeLore()
 }
 
@@ -381,19 +454,6 @@ async function copyName() {
   margin: 0;
 }
 /* Single-model base size (⌀50mm) to the right of the unit name on the header plate. */
-/* Sits under the title and inside the head block, so it reads before the statline rather than
-   after it. Muted, not alarming — the page below it is still a full datasheet. */
-.ds-legends-note {
-  flex-basis: 100%;
-  margin: 0.2rem 0 0;
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-/* The badge leads the line here, so it gives up the inline left margin it wears mid-sentence. */
-.ds-legends-note .legends-badge {
-  margin-left: 0;
-  margin-right: 0.35em;
-}
 
 .ds-title-base {
   display: inline;
@@ -496,18 +556,18 @@ async function copyName() {
   .ds-title { font-size: 1.5rem; }
 }
 
-/* Very narrow phones (≤480px): bleed the name plate past .main-content's gutter to the
-   true viewport edge and square its top corners, matching DatasheetCard's .ds-card below
-   it (same 100vw trick as FactionPickerBar's .fpb) — the two read as one flush, edge-to-edge
-   header instead of a floating card. Horizontal padding drops to .ds-card's own 0.4rem so
-   both line up, and the action buttons shrink to leave the (often long) unit name more room. */
-@media (max-width: 480px) {
-  /* Cancel FactionLayout's .faction-view top padding (0.5rem) so the full-bleed card sits
-     flush under the subnav, with no gap above the name plate — matching the edge-to-edge
-     treatment on the sides. */
-  .fsection {
-    margin-top: -0.5rem;
-  }
+.ds-page { container: dspage / inline-size; }
+
+/* Very narrow phones (≤480px of CONTAINER, the same measure DatasheetCard's own bleed keys on):
+   bleed the name plate past .main-content's gutter to the true viewport edge and square its top
+   corners, matching .ds-card below it (same 100vw trick as FactionPickerBar's .fpb) — the two
+   read as one flush, edge-to-edge header instead of a floating card. Horizontal padding drops to
+   .ds-card's own 0.4rem so both line up, and the action buttons shrink to leave the (often long)
+   unit name more room. */
+/* The "…" exists only where the buttons fold (below); a same-specificity rule inside the container
+   block has to come AFTER this one to win. */
+.ds-more { display: none; }
+@container dspage (max-width: 480px) {
   .ds-head {
     width: 100vw;
     margin-left: calc(50% - 50vw);
@@ -517,6 +577,29 @@ async function copyName() {
     min-width: 30px;
     min-height: 30px;
     font-size: 0.85rem;
+  }
+  /* Five buttons become one: the row is the name's, not the toolbar's. */
+  .ds-actions > .ds-btn:not(.ds-more) { display: none; }
+  .ds-more { display: flex; min-width: 36px; min-height: 36px; font-size: 1rem; }
+  /* …and the name takes the room back. Measured 2026-09-19 against the longest names in the data
+     ("Ironkin Steeljacks with Heavy Volkanite Disintegrators", 54 chars): at 360–430px, 1.75rem
+     wraps them to the same two lines 1.5rem did, ten pixels taller; a 25-char name ("Chaos Lord
+     with Jump Pack", the 90th percentile) stays on one line. Only a 320px screen needs a step
+     down to keep the longest at two lines. */
+  .ds-title { font-size: 1.75rem; }
+}
+@container dspage (max-width: 340px) {
+  .ds-title { font-size: 1.6rem; }
+}
+/* The sheet's rows carry the same icon the toolbar button did, so the two read as one thing. */
+.ds-act { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+.ds-act .bi { width: 1.1rem; text-align: center; color: var(--text-muted); }
+/* Cancel FactionLayout's .faction-view top padding (0.5rem) so the full-bleed card sits flush
+   under the subnav, with no gap above the name plate. .fsection is the container's parent and
+   cannot be queried from inside it; a viewport query is close enough for half a rem. */
+@media (max-width: 480px) {
+  .fsection {
+    margin-top: -0.5rem;
   }
 }
 </style>

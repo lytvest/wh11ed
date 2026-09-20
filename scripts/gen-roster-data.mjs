@@ -28,6 +28,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { ROOT, APPDATA, SLUG_MAP, norm, loadJson, loadModule } from './lib/sync-common.mjs'
+import { packRosterUnit, emptyPackReport } from './lib/pack-roster.mjs'
 
 const T = path.join(APPDATA, 'tables')
 const OUT = path.join(ROOT, 'src/data/roster')
@@ -328,7 +329,7 @@ const bmlByDs = new Map() // datasheetId -> [{miniatureId, opts:[{wargearOptionI
 
 // ---- Per-faction generation ------------------------------------------------------------
 
-const report = { factions: 0, units: 0, linked: 0, unlinked: [], missingBundle: [], noPoints: [], stale: [], loadoutFixed: [], price: { repriced: 0, collapsed: 0, chapterOverrides: 0, noUnit: [], noBracket: [], stepDrift: [] }, bundle: { rewritten: 0, quantified: 0, unclaimed: [], unbacked: [] }, limit: { limited: 0, counted: 0, bundled: 0, ambiguous: 0, unmatched: 0, fromProse: 0, fromProseScaled: 0, perModelEach: [], scaledDrift: [], perCopy: 0, conflict: [], merged: 0 }, rep: { resolved: 0, noMatch: [], unresolved: [] }, staticDefaults: 0, paidDefault: { units: 0, odd: [] }, sharedDets: 0, leadKw: { resolved: 0, unresolved: [] }, proseAttach: [], proseAttachAdded: 0, mirror: { rules: 0, added: [], unread: [] }, hosts: { read: [], unread: [] }, comp: { units: 0, brackets: 0, rejected: [] }, detTag: { tagged: 0, drift: [] }, alleg: { units: 0, kinds: new Set() }, defaultsMerged: [], allies: { groups: 0, units: 0, empty: [], missing: [], narrowed: [] } }
+const report = { factions: 0, units: 0, linked: 0, unlinked: [], missingBundle: [], noPoints: [], stale: [], loadoutFixed: [], price: { repriced: 0, collapsed: 0, chapterOverrides: 0, noUnit: [], noBracket: [], stepDrift: [] }, bundle: { rewritten: 0, quantified: 0, unclaimed: [], unbacked: [] }, limit: { limited: 0, counted: 0, bundled: 0, ambiguous: 0, unmatched: 0, fromProse: 0, fromProseScaled: 0, fromProseConditional: [], perModelEach: [], scaledDrift: [], perCopy: 0, conflict: [], merged: 0 }, rep: { resolved: 0, noMatch: [], unresolved: [] }, staticDefaults: 0, paidDefault: { units: 0, odd: [] }, sharedDets: 0, leadKw: { resolved: 0, unresolved: [] }, proseAttach: [], proseAttachAdded: 0, mirror: { rules: 0, added: [], unread: [] }, hosts: { read: [], unread: [] }, comp: { units: 0, brackets: 0, rejected: [] }, detTag: { tagged: 0, drift: [] }, alleg: { units: 0, kinds: new Set() }, defaultsMerged: [], allies: { groups: 0, units: 0, empty: [], missing: [], narrowed: [] }, pack: { ...emptyPackReport(), dropped: [] } }
 
 // …and two datasheets whose attachment appdata states in PROSE and in no table at all. The Ogryn
 // Bodyguard and Nork Deddog "must join one COMMAND SQUAD unit from your army" (their Loyal
@@ -446,9 +447,31 @@ for (const [dsName, kwName] of PROSE_ATTACH) {
 // as src/data/roster/items.js) keeps ids stable everywhere and folds for free.
 const itemIds = new Map() // wargear_item UUID -> int
 const textIds = new Map() // instruction text -> int
+// Items the Faction Pack Legends name that appdata has no row for (see itemByName): synthetic key
+// `pack:<norm name>` → printed name, read by genItems alongside wgItemName.
+const packItemNames = new Map()
 const fx = {
   item: (uuid) => { if (!itemIds.has(uuid)) itemIds.set(uuid, itemIds.size + 1); return itemIds.get(uuid) },
   text: (s) => { if (!textIds.has(s)) textIds.set(s, textIds.size + 1); return textIds.get(s) },
+  // An item by NAME, for the pack Legends units: the appdata item of that name where one exists —
+  // preferring one already interned, so a Legends Bike Squad's "Bolt pistol" is the same id every
+  // Space Marine already carries and the importer/stock rule/export cannot tell the sources apart
+  // — else a pack-only item under the printed name.
+  itemByName: (name) => {
+    const n = norm(name)
+    const uuids = wgItemByNorm.get(n) || []
+    const uuid = uuids.find((u) => itemIds.has(u)) || uuids[0]
+    if (uuid) return fx.item(uuid)
+    const key = `pack:${n}`
+    if (!packItemNames.has(key)) packItemNames.set(key, name)
+    return fx.item(key)
+  },
+}
+const wgItemByNorm = new Map()
+for (const [uuid, name] of wgItemName) {
+  const n = norm(name)
+  if (!wgItemByNorm.has(n)) wgItemByNorm.set(n, [])
+  wgItemByNorm.get(n).push(uuid)
 }
 
 // Invert sourceIds.json for a faction: appdata datasheet UUID -> wh11ed datasheet slug.
@@ -800,7 +823,10 @@ function nearName(words, name) {
 // every one of those items is stored with an ASCII hyphen. Character-level only and
 // length-preserving, so the match offsets that order the set stay meaningful; `norm` is not usable
 // here because it also strips a trailing "(...)", which belongs to names and not to sentences.
-const flatText = (s) => (s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[‐‑–—]/g, '-')
+// …and one row breaks a hyphenated name across a space ("1 neo- volkite pistol" on the Space
+// Marine Lieutenant, found by a player 2026-09-18): a hyphen glued to the letter before it and
+// followed by whitespace is that typo, never a spaced dash (" - "), so the space goes.
+const flatText = (s) => (s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[‐‑–—]/g, '-').replace(/(?<=[a-z])-\s+(?=[a-z])/g, '-')
 
 // The group's own items named in one statement, in order, with the count written in front of
 // them ("2 Mortifier flamers"). Longest name first so a name containing another ("master-crafted
@@ -1034,9 +1060,65 @@ function proseAllowance(text, optCount = 0) {
 // whole text; the other two are statements of the allowance itself and only count in it.)
 // ("duplicates are not allowed" is the parenthetical form, six groups; `can take duplicates` is
 // the OPPOSITE statement and must not be read as one of these.)
+// "You cannot select the same option more than once" is the Raptors' spelling of it (2026-09-19,
+// a player took two meltaguns from a group that allows one of each).
 const proseNoDuplicates = (text) =>
-  /cannot take duplicates|duplicates are not allowed/i.test(text) ||
+  /cannot take duplicates|duplicates are not allowed|cannot select the same option more than once/i.test(text) ||
   /\bany of the following\b|\bdifferent weapons\b/i.test(text.split('\n')[0])
+
+// The allowance that only exists at a unit size: "If this unit contains 10 models, up to 2
+// additional Raptors can each…", "If this unit contains 10 models, 1 Corsair Voidscarred's power
+// sword can be replaced…", and the block form over its own bullets —
+//
+//   If this unit contains 10 models:
+//   ◦ 1 Vespid Stingwing can replace its neutron blaster with 1 T'au flamer.
+//   ◦ 1 Vespid Stingwing can replace its neutron blaster with 1 neutron grenade launcher.
+//
+// where each bullet is a separate allowance (one model each, three models in all), and the
+// Troupe's two-block form ("9 or fewer models: up to two … / 10 or more models: up to four …").
+// proseAllowance refuses all of these on purpose (the number is conditional), and appdata's set
+// either does not exist or matches two identical groups — so these fell through to the editor,
+// which drew the multi-option ones as a one-of radio and offered every one of them at any size:
+// a 10-model Raptor squad could take one extra special weapon where the datasheet allows two, a
+// 5-model one could take it at all. Returns `lim` rows — `[threshold, picks, dup?]` — or null
+// where the text is not this shape or a bullet cannot be read; `optCount` tells the block form
+// whether its bullets ARE the options (then each bullet's number caps its own option, which the
+// dup slot expresses exactly when they all say the same number) or merely restate them.
+const COND_HEAD = /^if this unit contains (\d+)( or fewer| or more)? models?(,|:)\s*(.*)$/i
+function proseConditionalAllowance(text, optCount = 0) {
+  const blocks = text.split(/\n\s*\n/)
+  const rows = []
+  for (const block of blocks) {
+    const lines = block.split('\n').map((l) => l.trim()).filter(Boolean)
+    const head = lines[0] && COND_HEAD.exec(lines[0])
+    if (!head) return null
+    const at = head[2]?.trim() === 'or fewer' ? 0 : Number(head[1])
+    const dupSaid = proseNoDuplicates(block) ? 1 : 0
+    if (head[3] === ',') {
+      // One sentence: "up to 2 additional X can each…", "1 X's Y can be replaced…". The lines
+      // after it, if any, are the options and say nothing about the allowance.
+      const n = proseAllowance(head[4].replace(/\badditional\b/i, ''), optCount)
+      if (n == null) return null
+      rows.push(dupSaid ? [at, n, dupSaid] : [at, n])
+      continue
+    }
+    // A colon: the bullets under it are the allowances, one number each.
+    const bullets = lines.slice(1).map((l) => l.replace(/^[◦▪•*-]\s*/, ''))
+    if (!bullets.length) return null
+    const each = bullets.map((b) => proseAllowance(b))
+    if (each.some((n) => n == null)) return null
+    const total = each.reduce((a, b) => a + b, 0)
+    const same = each.every((n) => n === each[0])
+    if (optCount === bullets.length && same) rows.push([at, total, each[0]])
+    else if (dupSaid) rows.push([at, total, 1])
+    else rows.push([at, total])
+  }
+  if (!rows.length) return null
+  rows.sort((a, b) => a[0] - b[0])
+  // Two blocks cannot claim the same threshold, and every row must state a real allowance.
+  if (rows.some((r, i) => r[1] < 1 || (i && r[0] === rows[i - 1][0]))) return null
+  return rows
+}
 
 function linkWargearLimits(datasheetId, unitName, miniIdx, drafts, stats) {
   const sets = limitedSetsByDs.get(datasheetId) || []
@@ -1130,12 +1212,15 @@ function linkWargearLimits(datasheetId, unitName, miniIdx, drafts, stats) {
 // units of this army like any other. Two kinds of subfaction are not: a Chapter's "Space Marines"
 // section (the shared Codex pool, folded in at load time and priced by `unitPoints`) and Imperial
 // Agents' "(allied)" list, which is what those units cost in SOMEBODY ELSE'S army. The faction's
-// own list is appended last so it wins wherever a name appears in both.
+// own list is appended last so it wins wherever a name appears in both. The MFM's Legends
+// section (`legends`, behind the site's "Show Legends" toggle) prices the `legends: true`
+// sheets — appdata's for Orks, the Faction-Pack ones elsewhere — and goes in first, so a name
+// the Codex list also carries keeps the Codex price.
 function ownMfmUnits(mfmFaction) {
   const extra = (mfmFaction?.subfactions || [])
     .filter((s) => norm(s.name) !== 'space marines' && !/allied/i.test(s.name))
     .flatMap((s) => s.units || [])
-  return [...extra, ...(mfmFaction?.units || [])]
+  return [...(mfmFaction?.legends || []), ...extra, ...(mfmFaction?.units || [])]
 }
 
 function mfmPrices(mfmUnits) {
@@ -1722,6 +1807,16 @@ function buildUnit(bd, idMap, fx, kwIndex, prices) {
     d.lim = [dup ? [0, said, dup] : [0, said]]
     report.limit.fromProse++
   }
+  // …the CONDITIONAL form ("If this unit contains 10 models, …"), which is a step table with one
+  // row per block — see proseConditionalAllowance. Below its first threshold the group genuinely
+  // offers nothing, which wargearGroupCap already reads as a real 0.
+  for (const d of drafts) {
+    if (d.lim) continue
+    const rows = proseConditionalAllowance(d.text, d.opts.length)
+    if (!rows) continue
+    d.lim = rows
+    report.limit.fromProseConditional.push(`${bd.name}: ${JSON.stringify(rows)} — ${d.text.split('\n')[0].slice(0, 70)}`)
+  }
   // …and the SCALED form, which proseAllowance refuses because it is not one number: "For every 5
   // models in this unit, up to 2 models can each have their boltgun replaced with…" is a step
   // table, which is exactly what `lim` already is — one row per threshold the unit can reach.
@@ -1809,10 +1904,20 @@ function buildUnit(bd, idMap, fx, kwIndex, prices) {
   // several models can each pick something DIFFERENT — which is what a multi-option list means.
   // Groups whose profile count is a RANGE the player sets ("5-9 Reivers") are left alone: a step
   // table keyed on the unit's size cannot express "however many of them you took".
+  //
+  // The single-option spelling of the same thing — "Any number of models can each be equipped
+  // with 1 bio-plasma" on Carnifexes, a checkbox in appdata — drew as one TOGGLE for the unit,
+  // so two Carnifexes could carry one bio-plasma between them (2026-09-19). It is read too, but
+  // only where the sentence says "any number" and nothing is given up: a single-option swap
+  // ("Any number of X can each have their A replaced with 1 B") is `repall` below, one tick
+  // reaching every model, and stays that.
   for (const d of drafts) {
-    if (d.lim || d.in === 'stepper' || d.all || d.m == null || d.opts.length < 2 || !d.rep?.length) continue
+    if (d.lim || d.in === 'stepper' || d.all || d.m == null) continue
     const first = d.text.split('\n')[0]
-    if (!/^\s*(?:any number of|all models)\b/i.test(first) || !/\beach\b/i.test(first)) continue
+    if (!/\beach\b/i.test(first)) continue
+    const many = d.opts.length >= 2
+    if (many ? !/^\s*(?:any number of|all models)\b/i.test(first) : !/^\s*any number of\b/i.test(first)) continue
+    if (many ? !d.rep?.length : d.rep?.length) continue
     const rows = []
     for (const s of unit.sizes || []) {
       const comp = (s.comp || []).find(([mi]) => mi === d.m)
@@ -2198,13 +2303,60 @@ async function genFaction(slug) {
       report.sharedDets += sharedDets.names.length
     }
   }
-  const body = `${HEAD}export default ${stableJson(data)}\n`
-  writeOut(`${slug}.js`, body)
+  // Written after every faction has been built (see run): the pack Legends intern their items
+  // last, so the ids appdata's units carry do not move when a pack sheet is added.
+  built.push({ slug, data })
+}
+const built = []
+
+// ---- Faction Pack Legends ---------------------------------------------------------------
+// The Legends datasheets appdata never carried (`source: 'faction-pack'` in data/datasheets) are
+// read from their own printed composition/loadout/options by scripts/lib/pack-roster.mjs and
+// listed alongside the appdata units. Their ids ARE the datasheet ids (so `linked` needs no
+// sourceIds row), their prices are the MFM rows sync-mfm-points already wrote onto the sheet.
+async function packUnitsFor(slug, units) {
+  const sheets = ((await loadModule(path.join(ROOT, 'src/data/datasheets', `${slug}.js`)))?.default || [])
+    .filter((d) => d.source === 'faction-pack')
+  if (!sheets.length) return []
+  // Leader targets by name: this faction's appdata units, its pack sheets, and — for a Chapter —
+  // the shared Space Marines pool it folds in at load time (Codex units AND the SM pack Legends).
+  const unitIdByName = new Map(units.map((u) => [norm(u.name), u.id]))
+  for (const d of sheets) unitIdByName.set(norm(d.name), d.id)
+  if (isChapter(slug)) {
+    const smMap = unitIdMap('space-marines')
+    const smBundle = loadJson(path.join(APPDATA, 'factions', `${SLUG_MAP['space-marines']}.json`))
+    for (const d of smBundle?.datasheets || []) if (smMap.has(d.id) && !unitIdByName.has(norm(d.name))) unitIdByName.set(norm(d.name), smMap.get(d.id))
+    const smSheets = (await loadModule(path.join(ROOT, 'src/data/datasheets', 'space-marines.js')))?.default || []
+    for (const d of smSheets) if (d.source === 'faction-pack' && !unitIdByName.has(norm(d.name))) unitIdByName.set(norm(d.name), d.id)
+  }
+  // The Mark of Chaos: Pactbound Zealots' rule is written for "a HERETIC ASTARTES unit [that] is
+  // not an EPIC HERO and does not already have one of the following keywords" — a rule, not a
+  // list, so a pack Legends Chaos Lord on Bike gets the same choice appdata's 43 units carry.
+  const mark = units.find((u) => u.alleg?.g === 'mark-of-chaos')?.alleg
+  const MARKS = ['khorne', 'tzeentch', 'nurgle', 'slaanesh', 'chaos undivided']
+  const allegFor = (d) => {
+    if (!mark) return null
+    const kws = [...(d.keywords || []), ...(d.factionKeywords || [])].map(norm)
+    if (!kws.includes('heretic astartes') || kws.includes('epic hero') || kws.some((k) => MARKS.includes(k))) return null
+    return JSON.parse(JSON.stringify(mark))
+  }
+  // Keyword-named Leader targets ("Imperium Battleline Infantry"), against every unit this file
+  // will hold — appdata's and the pack's; a keyword that names nothing here resolves to nothing.
+  const kwOf = new Map(units.map((u) => [u.id, (u.kws || []).map(norm)]))
+  for (const d of sheets) kwOf.set(d.id, [...(d.keywords || []), ...(d.factionKeywords || [])].map(norm))
+  const unitsByKw = (kws) => [...kwOf].filter(([, have]) => kws.every((k) => have.includes(norm(k)))).map(([id]) => id)
+  const ctx = { report: report.pack, item: fx.itemByName, text: fx.text, unitIdByName, allegFor, unitsByKw }
+  const out = []
+  for (const d of sheets) {
+    const u = packRosterUnit(d, ctx)
+    if (u) { out.push(u); report.pack.units++ } else report.pack.dropped.push(`${slug}: ${d.name}`)
+  }
+  return out
 }
 
 function genItems() {
   const items = {}
-  for (const [uuid, id] of itemIds) items[id] = wgItemName.get(uuid) || ''
+  for (const [uuid, id] of itemIds) items[id] = wgItemName.get(uuid) || packItemNames.get(uuid) || ''
   const texts = {}
   for (const [s, id] of textIds) texts[id] = s
   const data = { items, texts }
@@ -2332,6 +2484,11 @@ const slugs = fs.readdirSync(path.join(ROOT, 'src/data/factions'))
 fs.mkdirSync(OUT, { recursive: true })
 genCore()
 for (const slug of slugs) await genFaction(slug)
+for (const { slug, data } of built) {
+  const pack = await packUnitsFor(slug, data.units)
+  if (pack.length) { data.units.push(...pack); data.units.sort((a, b) => a.name.localeCompare(b.name)); report.units += pack.length; report.linked += pack.length }
+  writeOut(`${slug}.js`, `${HEAD}export default ${stableJson(data)}\n`)
+}
 genItems() // after all factions — the intern dicts are complete
 genIndex()
 
@@ -2400,6 +2557,10 @@ if (lm.conflict.length) {
 }
 // appdata's table kept, ours discarded — but named, because a step form we read differently from
 // the table written off the same sentence is how a future data drop would quietly change a cap.
+if (lm.fromProseConditional.length) {
+  console.log(`  read "if this unit contains N models, …" as a step table (${lm.fromProseConditional.length}):`)
+  for (const c of lm.fromProseConditional) console.log(`    - ${c}`)
+}
 if (lm.perModelEach.length) {
   console.log(`  read "any number of X can each have…" as one pick per model of that profile (${lm.perModelEach.length}), drawn as a stepper instead of a one-of radio:`)
   for (const c of lm.perModelEach) console.log(`    - ${c}`)
@@ -2415,6 +2576,16 @@ for (const [why, list] of [["prose doesn't account for every option", b.unclaime
   console.log(`  left as appdata lists them — ${why} (${list.length}):`)
   for (const l of list) console.log(`    - ${l.replace(/\s+/g, ' ').slice(0, 110)}`)
 }
+// The Faction Pack Legends, read from their own printed text — every line below is a sheet the
+// roster shows less of than the PDF says; the parser guesses nothing, so each is a template to add.
+const pk = report.pack
+console.log(`  Faction Pack Legends: ${pk.units} units read from their printed composition/loadout/options${pk.dropped.length ? `, ${pk.dropped.length} not readable` : ''}`)
+for (const [why, list] of [['sheet dropped', pk.dropped], ['composition line unreadable', pk.composition], ['price bracket outside the composition', pk.bracket], ['no usable price', pk.noPoints], ['loadout paragraph unplaced (unit keeps no default loadout)', pk.loadout], ['option sentence unread (choice left out)', pk.option], ['replaced item not in the printed loadout (group has no rep)', pk.rep], ['item the sheet does not print (kept under its printed name)', pk.unknownItem], ['Leader target not found', pk.lead], ['notes', pk.note]]) {
+  if (!list.length) continue
+  console.log(`    ${why} (${list.length}):`)
+  for (const l of list.slice(0, 40)) console.log(`      - ${l.replace(/\s+/g, ' ')}`)
+  if (list.length > 40) console.log(`      … +${list.length - 40} more`)
+}
 if (report.unlinked.length) {
   console.log(`  unlinked units (no datasheet page — slugified id, no deep link):`)
   for (const u of report.unlinked.slice(0, 40)) console.log(`    - ${u}`)
@@ -2427,6 +2598,14 @@ if (CHECK) {
   if (report.stale.length) {
     console.log(`\n  --check: ${report.stale.length} file(s) would change — run \`npm run roster:data\`:`)
     for (const f of report.stale.slice(0, 40)) console.log(`    - src/data/roster/${f}`)
+    return 1
+  }
+  // A group whose prose the parser could not fully account for is a swap the list cannot make
+  // the way the datasheet says — the Lieutenant's shield loadout sat in this list, printed and
+  // unread, until a player reported it (2026-09-18). Zero today; a new one is a gate, not a note.
+  // (`unbacked` stays a note: those are one-of lists appdata's enumeration simply does not cover.)
+  if (b.unclaimed.length) {
+    console.log(`\n  --check: ${b.unclaimed.length} wargear group(s) whose prose the bundle parser could not account for — read them above; a misspelling in appdata's instruction is the usual cause (flatText).`)
     return 1
   }
   console.log('\n  --check: up to date.')

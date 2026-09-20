@@ -358,12 +358,18 @@ describe('replaced-item links', () => {
   it('leaves almost nothing unparsed across the corpus', () => {
     // Two leftovers remain, both "X or Y" where the profile holds both alternatives, and both
     // fail-open by design. The number is here so a parser regression shows up as a jump.
+    // The Faction Pack Legends (no appdata `sid`) are counted apart: their 12 are CHAINED swaps
+    // — "bolt pistol" on Death Company Marines with Boltguns, who only gain one through an
+    // earlier swap — and the pack's own misprints (Secutarii Peltasts' "arc lance"), which no
+    // reader of the printed loadout can resolve.
     let withReplaced = 0
     let missing = 0
+    let packMissing = 0
     for (const { data } of factions) {
       for (const u of data.units || []) {
         for (const g of u.gear || []) {
           if (!/replaced with/i.test(rosterItems.texts[g.t] || '')) continue
+          if (!u.sid) { if (!g.rep?.length) packMissing++; continue }
           withReplaced++
           if (!g.rep?.length) missing++
         }
@@ -371,6 +377,7 @@ describe('replaced-item links', () => {
     }
     expect(withReplaced).toBeGreaterThan(800)
     expect(missing).toBeLessThanOrEqual(2)
+    expect(packMissing).toBeLessThanOrEqual(12)
   })
 })
 
@@ -555,6 +562,10 @@ describe('unit composition', () => {
       for (const u of data.units || []) {
         if (!(u.minis?.length > 1)) continue
         for (const s of u.sizes) {
+          // A Faction Pack sheet (no appdata `sid`) whose bracket spreads over two open-ended
+          // profiles — a Bike Squad's Bikers and its Attack Bike — has no exact split to record
+          // and carries none; the parts of what it does record still have to add up.
+          if (!u.sid && !s.comp) continue
           expect(s.comp, `${slug}/${u.id} @${s.pts}`).toBeTruthy()
           const sum = s.comp.reduce((a, c) => [a[0] + c[1], a[1] + (c.length === 3 ? c[2] : c[1])], [0, 0])
           expect(sum, `${slug}/${u.id} @${s.pts}`).toEqual(s.per)
@@ -610,6 +621,39 @@ describe('wargear names are unambiguous within a unit', () => {
       }
     }
   })
+
+  // The other half of the same bargain. A weapon row nothing claims is always shown (the overlay
+  // errs towards showing more), so an item name that differs from its row by a GLYPH — the
+  // non-breaking hyphen appdata puts in "Master‑crafted power weapon", the datasheet's plain one —
+  // is a swap the card can't hide: the Archon who took that weapon showed his huskblade too (a
+  // player's report, 2026-09-20). `norm` folds the glyphs it knows about; this walks every sheet
+  // and fails on the first unclaimed row whose name is an item's once ALL punctuation is levelled.
+  // A row that differs in SPELLING ("Close combat weapon" against the item's "Close-combat weapon")
+  // is not a glyph gap and stays on the conservative side, unclaimed.
+  it('claims every weapon row that is an item name in different glyphs', async () => {
+    const { weaponRowClaimer } = await import('../../composables/rosterModifiers.js')
+    const { loadDatasheets } = await import('../datasheets/index.js')
+    const level = (s) => (s || '').toLowerCase().normalize('NFKD')
+      .replace(/\p{M}/gu, '').replace(/[\p{P}\p{S}]/gu, '-').replace(/\s+/g, ' ').trim()
+    let rows = 0
+    for (const { slug } of factions) {
+      const [fac, sheets] = await Promise.all([loadRosterFaction(slug), loadDatasheets(slug)])
+      for (const u of fac?.units || []) {
+        const sheet = sheets?.find((d) => d.id === u.id)
+        const claim = sheet && weaponRowClaimer(u, rosterItems.items)
+        if (!claim) continue
+        const levelled = new Set()
+        for (const [, list] of u.defaults || []) for (const [id] of list) levelled.add(level(rosterItems.items[id]))
+        for (const g of u.gear || []) for (const o of g.o || []) for (const [id] of optionItems(o)) levelled.add(level(rosterItems.items[id]))
+        for (const w of [...(sheet.ranged || []), ...(sheet.melee || [])]) {
+          rows++
+          if (claim(w.name)) continue
+          expect(levelled.has(level(w.name)), `${slug}/${u.id} "${w.name}" is an item spelled with other glyphs`).toBe(false)
+        }
+      }
+    }
+    expect(rows).toBeGreaterThan(9000) // the whole corpus really was walked
+  })
 })
 
 describe('detachment tags', () => {
@@ -648,7 +692,10 @@ describe('allegiance choices', () => {
     .filter((u) => u.alleg).map((u) => ({ slug, u })))
 
   it('reaches every datasheet appdata gives one', () => {
-    expect(withAlleg()).toHaveLength(92)
+    // 92 from appdata, plus the 17 Faction Pack Legends of the Chaos Space Marines that the
+    // Pactbound Zealots rule reaches by its own wording (a HERETIC ASTARTES unit that is not an
+    // EPIC HERO and carries no mark already) — see gen-roster-data.mjs's packUnitsFor.
+    expect(withAlleg()).toHaveLength(92 + 17)
   })
 
   it('always offers something to choose, and says whether it must be chosen', () => {

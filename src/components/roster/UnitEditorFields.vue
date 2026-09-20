@@ -205,7 +205,7 @@
     >
       <section
         class="ues-sec"
-        :class="{ 'ues-inert': blockers[gi] }"
+        :class="{ 'ues-inert': shut[gi] }"
       >
         <!-- `ues-instr`, unlike every other .ues-h on this screen: what stands here is a SENTENCE
            out of the datasheet, not a label. See the style rule for why that needs a different
@@ -263,13 +263,13 @@
             v-for="opt in radioRows(g)"
             :key="opt.oi ?? 'default'"
             class="opt-tile"
-            :class="{ on: radioSel(gi) === opt.oi, disabled: !!blockers[gi] }"
+            :class="{ on: radioSel(gi) === opt.oi, disabled: shut[gi] }"
           >
             <label class="opt-select">
               <input
                 type="checkbox"
                 :checked="radioSel(gi) === opt.oi"
-                :disabled="!!blockers[gi]"
+                :disabled="shut[gi]"
                 @change="setRadio(gi, opt.oi)"
               >
               <span class="opt-name">{{ opt.name }}</span>
@@ -296,13 +296,13 @@
         >
           <div
             class="opt-tile"
-            :class="{ on: toggleOn(gi), disabled: !!blockers[gi] }"
+            :class="{ on: toggleOn(gi), disabled: shut[gi] }"
           >
             <label class="opt-select">
               <input
                 type="checkbox"
                 :checked="toggleOn(gi)"
-                :disabled="!!blockers[gi]"
+                :disabled="shut[gi]"
                 @change="toggle(gi)"
               >
               <span class="opt-name">{{ optLabel(g.o[0]) }}</span>
@@ -331,7 +331,7 @@
             v-for="(o, oi) in g.o"
             :key="oi"
             class="opt-tile"
-            :class="{ disabled: !!blockers[gi] }"
+            :class="{ disabled: shut[gi] }"
           >
             <div class="opt-step-body">
               <span class="opt-name">{{ optLabel(o) }}<span
@@ -342,7 +342,7 @@
                 :model-value="stepCount(gi, oi)"
                 :min="0"
                 :max="stepMax(gi, oi)"
-                :disabled="!!blockers[gi]"
+                :disabled="shut[gi]"
                 @update:model-value="setStep(gi, oi, $event)"
               />
             </div>
@@ -468,7 +468,7 @@ import FactionAccentScope from './FactionAccentScope.vue'
 import { ui } from '../../i18n/ui.js'
 import { useLocale } from '../../composables/useLocale.js'
 import { loadRosterTextsRu } from '../../data/roster/ru/index.js'
-import { ENTRY_NOTE_MAX, allySourceOf, allegFor, allegSpent, defaultLoadoutLines, defaultWargearPoints, modelsPerMini, optionItems, optionLabel, setNote, splitInstruction, wargearGroupBlocker, wargearGroupCap, wargearGroupFallbackCap, wargearGroupSpent } from '../../composables/rosterEngine.js'
+import { ENTRY_NOTE_MAX, allySourceOf, allegFor, allegSpent, defaultLoadoutLines, defaultWargearPoints, modelsPerMini, optionItems, optionLabel, setNote, splitInstruction, swapRoom, wargearGroupBlocker, wargearGroupCap, wargearGroupFallbackCap, wargearGroupSpent } from '../../composables/rosterEngine.js'
 
 const props = defineProps({
   entry: { type: Object, required: true },
@@ -525,10 +525,17 @@ const caps = computed(() => (props.def.gear || []).map((g, gi) => wargearGroupCa
 // The group is still drawn either way — greyed, its current pick visible — so the sentence below
 // is the only thing that has to explain itself.
 const blockers = computed(() => (props.def.gear || []).map((g, gi) => wargearGroupBlocker(props.def, props.entry, gi)))
+// A group is shut for one of two reasons, each with its own sentence below the instruction: a
+// sibling group holds the weapon it would give up (`blockers`), or the squad is too small for it
+// (a cap of 0 — "If this unit contains 10 models…" at 5). The rows were only greyed for the first
+// until 2026-09-19; the second said "not available" and let you tick anyway, and validateRoster
+// then reported the pick. Same rule for both now: drawn, greyed, current pick visible.
+const shut = computed(() => (props.def.gear || []).map((g, gi) => !!blockers.value[gi] || !!(caps.value[gi] && !caps.value[gi].limit)))
 function blockerText(gi) {
   const b = blockers.value[gi]
   if (!b) return ''
-  const lead = b.need === 'gone' ? labels.value.rosterCondNeedGone : labels.value.rosterCondNeedPresent
+  const lead = b.need === 'stock' ? labels.value.rosterCondNeedStock
+    : b.need === 'gone' ? labels.value.rosterCondNeedGone : labels.value.rosterCondNeedPresent
   // Item names stay English, like everywhere else in the roster data.
   return `${lead} ${b.ids.map((id) => props.items?.[id]).filter(Boolean).join(', ')}`
 }
@@ -713,15 +720,20 @@ function stepMax(gi, oi) {
   // FOLLOWING" is one budget of models, however many rows it is drawn as — so a row's own room is
   // whatever is left of it.
   const elsewhere = wargearGroupSpent(props.entry, gi, oi)
+  // The stock rule (rosterEngine's swapRoom): a stepper counts models, and a model that already
+  // gave the weapon up to ANOTHER group is not there to give it up again — five Terminators with
+  // five combi-weapons have no combi-bolter left for a heavy weapon. `room` is what the other
+  // groups left this one, so it is the group's whole budget here, whatever its own cap says.
+  const room = swapRoom(props.def, props.entry, gi, oi)
   const cap = caps.value[gi]
-  if (cap) return Math.max(0, Math.min(cap.dup || cap.limit, cap.limit - elsewhere))
+  if (cap) return Math.max(0, Math.min(cap.dup || cap.limit, Math.min(cap.limit, room ?? Infinity) - elsewhere))
   // "For every 5 models in this unit:" over a BULLET LIST, and only that: the generator reads every
   // scaled allowance that states its number into `lim` (gen-roster-data.mjs's SCALED_ALLOWANCE), so
   // what is left here is the umbrella whose bullets are separate allowances — a Red Corsairs Raider
   // squad swaps 1 boltgun AND 1 reaver's blade per 5 models. Per option is the right reading for
   // those, and the two groups in that shape are the only ones that still reach this line.
   const m = (props.texts[props.def.gear[gi].t] || '').match(/for every (\d+) model/i)
-  if (m) return Math.floor(models.value / Number(m[1]))
+  if (m) return Math.min(Math.floor(models.value / Number(m[1])), room ?? Infinity)
   // No cap of any kind: the group can be taken by every model it belongs to — which on a
   // multi-profile datasheet is that PROFILE's model count, not the squad's. "Any number of
   // Sicarian Ruststalkers can each have their transonic razor replaced" excludes the Princeps,
@@ -737,7 +749,7 @@ function stepMax(gi, oi) {
   // guess is not something to subtract from: it keeps the row-by-row ceiling it always had, which
   // is the same reason validateRoster does not police those groups either.
   const own = wargearGroupFallbackCap(props.def, props.entry, gi)
-  if (own != null) return Math.max(0, own - elsewhere)
+  if (own != null) return Math.max(0, Math.min(own, room ?? Infinity) - elsewhere)
   return models.value * (props.def.gear[gi].cp || 1)
 }
 

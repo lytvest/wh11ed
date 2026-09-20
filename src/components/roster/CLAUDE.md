@@ -192,7 +192,71 @@ fall through to the one-pick fallback:
 
 Both read the FIRST line only, as every allowance does. "cannot take duplicates", by contrast, is
 read from the whole text: it is usually a footnote under the list (two T'au groups keep their
-duplicate cap only because of that).
+duplicate cap only because of that). *"You cannot select the same option more than once"* is the
+Raptors' spelling of the same rule (added 2026-09-19 — a player took two meltaguns from the group).
+
+**The conditional form** (added 2026-09-19, `proseConditionalAllowance`) is the one `proseAllowance`
+refuses: *"If this unit contains 10 models, up to 2 additional Raptors can each…"*, *"If this unit
+contains 10 models, 1 Corsair Voidscarred's power sword can be replaced…"*, the block whose bullets
+are each an allowance (Vespid Stingwings: three *"1 Vespid Stingwing can replace…"* bullets are three
+models, `[[10, 3, 1]]`), and the Troupe's two blocks (*"9 or fewer models: up to two…"* /
+*"10 or more: up to four…"* → `[[0, 4, 2], [10, 8, 4]]`). It is a step table — one row per block —
+and below the first threshold the cap is a real 0, which the editor already says in words. Four
+groups corpus-wide, all of which drew as a one-of radio offered at any size: a 10-model Raptor squad
+could take one extra special weapon where the datasheet allows two, and a 5-model one could take it
+at all. appdata's own set for the Raptors is one pool over BOTH groups (2 at any size, 4 at 10) and
+matches both identically, so it is reported ambiguous and the prose is what remains.
+
+The single-option *"Any number of models can each be equipped with 1 bio-plasma"* (Carnifexes, a
+checkbox in appdata with nothing given up) is read as one per model too, like its multi-option
+sibling below — it drew as one toggle for the unit, so two Carnifexes shared one bio-plasma. A
+single-option SWAP in that wording stays `repall` (one tick reaching every model).
+
+How to look for the next one of these: `scripts/` has no audit for it, but the shape is always
+"prose implies more than one pick, group carries no `lim`, and the editor's `mode()` makes it a
+radio or toggle" — dump every group without `lim`/`all`/`cp` whose first line has a number above
+one, "each", "any number", "all models", "if this unit" or "for every", and read what is left after
+dropping the bundled swaps ("2 X can be replaced with 2 Y" is one pick). The T'au *"any number of
+models can each be equipped with up to two of the following"* (a per-MODEL budget `lim` cannot
+express) is the known remainder — hub `journal/paused/2026-09-13-player-report-tails.md` §1.
+
+### The stock rule: a weapon is given up once (added 2026-09-19)
+
+A player found the Chaos Lord with Jump Pack taking a plasma pistol (for his bolt pistol), a power
+fist (for his accursed weapon) AND twin lightning claws (for both) at once. The data knew better all
+along — every one of those groups carries `rep`, what it replaces — but the only reader of `rep`
+was the loadout line, which clipped the remainder at zero and said nothing. 98 profile/item pairs on
+72 datasheets could be given up twice.
+
+`rosterEngine.swapLedger` is now the one place that spends swaps, and three readers sit on it:
+
+- **`swapsByMini`** (the loadout line, the modifier overlay, the export) — unchanged in meaning,
+  GROSS: every model that took a swap gave up everything the group replaces, and the option's own
+  grants are added by the reader.
+- **`swapRoom(def, entry, gi, oi?)`** — how many models still carry every item a pick in this group
+  would take, the group's own picks not counted. The editor greys an untouched group out through
+  `wargearGroupBlocker` (`need: 'stock'`, "Already replaced by another choice: bolt pistol") and
+  caps a stepper at the room the other groups left it. A group that already holds a pick is never
+  closed: its pick is what the player would undo, and a greyed-out row cannot be undone.
+- **`swapOverdraft`** — `{ id, used, cap }` per item given up by more models than carry it, which
+  `validateRoster` reports as `overWargearReplaced`. Lists built before the rule, imported, or
+  shrunk under their swaps land here; nothing is auto-trimmed.
+
+Two readings keep legal lists legal. **Picks are summed per group before they meet the model
+count**: the Devastator Sergeant's "bolt pistol and boltgun can be replaced with two different
+weapons" is two rows in one group on one model, one allowance, not the pistol given up twice. **An
+item the chosen option hands back is not given up** (`back`, the net half of the ledger):
+Deathwatch Veterans trade "boltgun and power weapon" for "power weapon and Astartes shield", and
+the Watch Sergeant who did so still holds a power weapon to trade for a xenophase blade — the GW app
+builds him that way, and 13 corpus lists did. Room is therefore asked per OPTION where the options
+differ in what they return.
+
+Fail-open, as every other reader here: a per-copy group (`cp`), a unit whose models cannot be split
+between profiles (`modelsPerMini` null), an item the profile's printed loadout does not carry (a
+chained swap, an unresolved "X or Y") and a `total` line are not stock and never close anything.
+Known residue: the importer breaks a tie between two same-named options (the two shield bundles)
+by order, so one corpus list in 658 arrives with a Sergeant who swapped his power weapon twice and
+is told so — the fix is one tap in the editor; a stock-aware tie-break is the importer's to grow.
 
 ### Attachments named by keyword
 
@@ -271,6 +335,64 @@ not — a seven-model squad is 345. So it is a term of its own in `unitPoints()`
 No option in the corpus is both priced and flagged default, so `unitWargearPoints()` and
 `defaultWargearPoints()` cannot double-charge; the old `def`-flag branch that assumed otherwise is
 gone.
+
+### The Faction Pack Legends — units read from their own text (added 2026-09-19)
+
+appdata carries Legends for the Orks only. The other 314 Legends datasheets live in
+`src/data/datasheets/<slug>.js` with `source: 'faction-pack'`, transcribed from the Faction Pack
+PDFs (hub skill `legends-from-pack`), and until 2026-09-19 the roster did not know them: nothing in
+appdata's tables describes their profiles, loadouts or swaps. **`scripts/lib/pack-roster.mjs`** reads
+the three printed fields instead and `gen-roster-data.mjs`'s `packUnitsFor` lists the result beside
+the appdata units of the same faction file (a Chapter's file carries the Chapter's own pack sheets;
+the Space Marines pack sheets reach a Chapter through `sharedUnitIds`, which the datasheet layer
+folds them into since 2026-09-20 — see "SM-Chapter datasheet dedup" in `src/data/CLAUDE.md` for
+which ones each Chapter is denied and why).
+
+- **`composition`** → `minis` and `sizes`. "1 Biker Sergeant / 2-5 Space Marine Bikers / 0-1 Attack
+  Bike" is three profiles; the MFM rows the sheet already carries (`sync-mfm-points`) become brackets
+  the way the app reads them — a row prices every size above the previous row up to its own count.
+  `comp` is emitted only where the profiles' ranges add up to the bracket exactly, as the appdata
+  reader keeps it: a bracket spread over two open-ended profiles carries none and every reader falls
+  back (the Deathwatch-team behaviour). A row the composition cannot hold ("1 model" on a squad of
+  3–7, the MFM's add-on prices) is dropped and reported. "One of the following:" over two whole
+  compositions (Death Korps Grenadier Squad) is folded into one range per profile, wider than the
+  two legal builds, and said so.
+- **`loadout`** → `defaults`. One paragraph per subject; "This/Every model" is every profile, a name
+  is that profile (plural-blind, `pkey`: "Kill Team Intercessors with plasma incinerators" and its
+  singular are one name; a named crew — Kill Team Cassius, Hell's Last — reaches its profile through
+  the composition's aliases). A paragraph about ONE model ("One Nightmare Hulk", "1 Lesk's Hero"
+  four times) is a profile TOTAL (the `[id, count, 1]` slot the Servitor Battleclade uses), not a
+  per-model kit.
+- **`options`** → `gear`. Every sentence resolves to WHO (a profile, or unit-wide), HOW MANY models
+  (one → checkbox; up to N, N per 5, any number → stepper with the matching `lim`), WHAT is given up
+  (`rep`, resolved against the profile's printed loadout — chained swaps and the pack's own
+  misprints stay without one, fail-open) and the VALUE (a bullet list, "up to two of the
+  following[, and can take duplicates]", "two different weapons from the following list" → limit 2
+  / dup 1, an inline set "1 X and 2 Y" → a bundle). "Each of this model's X" → `cp`. "[not] equipped
+  with X" → `cond` on the sibling that grants or gives X up (a bundle counts as granting). A
+  generic "models" allowance that only one profile can make ("Up to 3 models can each have their
+  storm bolter replaced…" where only the Terminators carry one) belongs to that profile. "The Assault
+  Sergeant can do one of the following:" becomes one group per bullet, the later gated on the first.
+- **Items** are interned BY NAME through `fx.itemByName`: the appdata item of that name where one
+  exists (preferring one already interned), else a pack-only item under the printed spelling — so a
+  Legends Bike Squad's bolt pistol is the same id every Space Marine carries and the importer, the
+  stock rule and the export cannot tell the sources apart. Pack items are interned LAST (the faction
+  files are written after every faction is built), so appdata's ids do not move when a pack sheet is
+  added.
+- **Leaders** by name against the faction's units (and the SM pool for a Chapter); a keyword target
+  ("Imperium Battleline Infantry") becomes `leadKw` plus the resolved ids. **The Mark of Chaos** is
+  granted by the Pactbound Zealots rule's own wording — a HERETIC ASTARTES unit, not an EPIC HERO,
+  carrying no mark already — copied from an appdata unit that has it; 17 CSM sheets.
+- **Fail-closed, reported by name.** The generator prints every sheet dropped, bracket rejected,
+  loadout paragraph unplaced, option sentence unread, replaced item unresolved, item the sheet does
+  not print, Leader target not found — under "Faction Pack Legends" in the run report. Read it after
+  a pack sheet is added or re-transcribed; a new wording is a template to add to `parseOption`, not
+  a note. Today: one sheet dropped (T'au Tactical Drones, no MFM price), 12 chained/misprinted `rep`s,
+  the two `"with:"`-style Kill Team leftovers all read.
+- **RU** for the new instruction wordings is the same generated layer (`npm run roster:texts-ru`),
+  extended the same day: footnote lines are split off and translated where known (the Armoury card
+  sentence, "Maximum one per model"…), and a dozen frames were added for the pack's phrasings. 290/290
+  pack instructions translate.
 
 ### Reading a swap that only shows as a count (added 2026-08-24)
 
@@ -960,6 +1082,39 @@ fixed above) against 214 that matched to the point. Neither the corpus nor the s
 they live outside `src/`, nothing imports them, and the whole batch of fixes above added 891 bytes
 to one existing chunk.
 
+`--all out.json [--rtt]` (2026-09-19) walks the API behind those pages instead —
+`/api/recentLists?page=N&gameType=40k`, 25 a page, ~1,800 GT lists (~4,700 with RTTs) — and is the
+corpus to use: the faction pages hand out 25 a faction and are thin on the current version. The
+1,817-list pass of 2026-09-19 (157 at v946) found, and the importer now handles: **nesting read
+from the bullets** — listhammer strips the indentation, so every app export arrived flat with all
+profiles' weapons pooled ("•" is the model line, "◦" its weapons; a bare line among them is a
+comment, not a model); **bundle fit scored per profile and by what the list holds MORE of than
+printed** (a Seraphim Superior's plasma pistol + power weapon against the squad's bolt pistols; a
+Death Company Marine's inferno pistol + chainsword against + power fist); **each profile's own
+printed stock absorbs its lines before any line borrows unit-wide**; **a half shared by every
+option of one group is not a pick count** (Purgation Squad's close combat weapons); **a stepper
+takes its group's room and spills the rest** to the next candidate, and a line joining a bundle
+already picked takes that bundle's pick count (three power fists = two inferno bundles + the plain
+swap; a Stormsword's five twin heavy bolters = the lascannon bundle once + the flamer swap once);
+**an uncapped group is bounded by its models** (`wargearGroupFallbackCap`); **the same option offered
+by two groups is not a shared half** (the Raptors' two identical special-weapon groups: "1x Meltagun"
+inherited the count of the "2x Close combat weapon" line and became two), **room is read per option
+where the group is one-of-a-kind** (`dup` — two plasma guns on 10 Raptors are one from each group),
+**a group with a cap of 0 is not opened** (the 10-model group at 5 models), and **a weapon two groups
+offer leaves the group that is the only home of a later line** (a Carnifex's crushing claws go to
+the scything talons so the heavy venom cannon keeps the extra pair) — all 2026-09-19, the corpus lost
+13 false alarms and gained none; **the WTC parser keeps a
+WTC body under section headings or an "Attached unit" line** — only the app's own tells ("Attached
+as:", "◦") route to the app's parser — and tolerates "(With Outriders)" after the points; **points
+glued to the name** ("Vertus Praetors215 Points", a paste from the rendered page). Validation:
+**an Upgrade counts once toward the enhancement limit** however many units carry it (muster rules;
+eight legal lists were flagged). Across the corpus: over-limit wargear 219 → 24 lines, unknown
+datasheets 232 → 163 (the rest are old-codex units, foreign-language exports and hand-typed lists),
+current-version lists clean 132 → 148 of 157. What is left at v946 is the lists' own doing (no
+Warlord set, comments pasted into a unit) and one open question: two GT lists price the Vindicare
+at 130 and the Eversor at 115 where MFM v1.4 says 110/100 — a points update the website does not
+show yet, or not; not ours to guess.
+
 - `rosterShare.js` — roster → deflate-compressed base64url payload carried in the URL
   **hash** (`/roster/shared#r=<payload>`, never reaches the server/CDN). Version-prefixed
   decoder (`1.` = deflate-raw, `0.` = uncompressed fallback for engines without
@@ -1034,17 +1189,39 @@ steps, and the phone its modal.
 
 - **`RosterWorkbench.vue`** owns both arrangements, so the catalogue and the list are written once
   per screen: `desk` renders the three columns, otherwise it renders the same `.roster-panes`
-  markup the two screens always had. Each desk column **scrolls inside itself, and the page does
-  not scroll at all** (2026-09-18): the columns are `height: 100dvh − --rw-top − --roster-sticky-h
-  − 1rem`, where `--rw-top` is where they start in the document, MEASURED by the workbench (a
-  ResizeObserver on the body, re-run on resize — the settings bar and the faction-rules fold above
-  them are as tall as their content, which CSS cannot know), and `App.vue`'s desk padding reserves
-  exactly the same bar-plus-gap below, so the page ends at the window's edge. Until 2026-09-18 the
-  columns were sticky under the navbar and capped against it alone, and the page still scrolled by
-  the height of everything above them — four scrollbars. A `min-height: 16rem` floor keeps a column
-  usable if the fold above opens on something long; the page then scrolls, which beats an unusable
-  column. All three are `container-type: inline-size`, which is why nothing inside them needed
-  rewriting: the rows already size themselves against their pane.
+  markup the two screens always had. Each column — the desk's three (2026-09-18) and the two panes
+  below it (2026-09-19) — **scrolls inside itself, and the page does not scroll at all.** The
+  model is a flex column, not a measured column: while the columns are showing, the screen's root
+  carries `.rw-host` (`style.css`) — a flex column exactly `100dvh − --rw-top − --rw-below` tall —
+  and every box between the root and the columns is `.rw-fill`, passing the room down; header,
+  tabs and the faction-rules fold keep their natural height, the columns (`flex: 1; min-height:
+  0`, one `minmax(0, 1fr)` grid row) take the rest. The two numbers CSS cannot know are measured
+  by the workbench and written on the root: `--rw-top`, where the root starts in the document
+  (navbar, an update banner, the page's top padding), and `--rw-below`, the paddings between the
+  root and the end of `.main-content` — summed from computed styles, never read off the boxes,
+  because `.main-content` can be as tall as the window on a short page and measuring against its
+  edge fed the root's height back into itself. Neither changes while the user works inside the
+  screen, so the observers (body, `.main-content`'s border box — the reserve is its padding — and
+  `resize`) fire on real changes only; the fold opening above the columns shrinks them in the
+  same layout pass with no script in the loop. The first version measured where the COLUMNS
+  start and re-measured on every frame of the fold's animation; the columns lagged the fold by a
+  frame, the page became scrollable and unscrollable in alternation, and a phone showed it as the
+  whole screen shivering. `App.vue`'s `.main-content--desk` padding is the only reserve under the
+  screen at every width — the fixed Cancel/Save bar, the bottom nav where there is one, a gap —
+  and the two screens' own footer paddings went with this. Before 2026-09-18 the columns were
+  sticky under the navbar and capped against it alone, and the page still scrolled by the height
+  of everything above them; below the desk that arrangement lasted a day longer, and on a phone
+  it meant a finger on the catalogue scrolled the catalogue until it ran out and then the page
+  (scroll chaining), which a player described as the page «lagging». A `min-height` floor (16rem
+  on the desk, 12rem in the panes — a phone with the keyboard up has less to give) keeps a column
+  usable if the fold above opens on something long; the columns then overflow the root and the
+  page scrolls, which beats an unusable column. All columns are `container-type: inline-size`,
+  which is why nothing inside them needed rewriting: the rows already size themselves against
+  their pane. Because height is what the columns are paid from, both screens fold what sits above
+  them on a phone (≤900px): the editor hides its back link (the bar's Back goes to the same place)
+  and shrinks the name row and tab margins; the wizard puts the back link and the step markers on
+  one line. The Settings tab and the wizard's step 1 are ordinary pages: `.rw-host` is bound to
+  the columns being up.
 - **`RosterSettingsBar.vue`** is the top line — name, faction, detachments (with the DP count),
   battle size, Force Disposition, then the points and the issue badge. It holds no state: both
   callers own a roster and do different things with the same answer (the wizard's faction pick also
@@ -1087,7 +1264,10 @@ round trip: add it there, see what it costs here. The reader who reported it had
 way and called the flow «путано».
 
 The panes are two columns on a phone as well, which is a deliberate choice and not an oversight —
-but half a phone is ~180px, and everything inside a pane has to be laid out for that.
+but half a phone is ~180px, and everything inside a pane has to be laid out for that. Since
+2026-09-19 each pane is its own scroll area on a page that stands still (see the desk section
+above for the mechanics — the same `RosterWorkbench` measurement); the alternative of one tab per
+pane was offered and turned down by the owner in favour of keeping both in view.
 
 **Both panes are query containers** (`container-type: inline-size`) and every compact arrangement
 inside them is an `@container (max-width: 300px)` rule, not a media query. A viewport breakpoint
@@ -1345,7 +1525,9 @@ away is counted on screen.
 **Two things never go inside the fold**, because a closed accordion must not hide why the
 catalogue is short: the "N hidden" line under it (inside the block, above its rule — that note is
 the filters talking, not the list) and a count of the active filters on the header itself. The
-fold also starts OPEN whenever a remembered filter is already on. A `border-bottom` closes the
+fold always starts closed — until 2026-09-19 it opened whenever a remembered filter was on, which
+on a phone spent three rows of the catalogue on switches already summed up by that count. A
+`border-bottom` closes the
 block off from the groups below: stacked in a column, its header would otherwise read as one more
 battlefield role.
 
@@ -1859,7 +2041,11 @@ nothing left to actually persist; "Cancel" is a plain `RouterLink` back to `/ros
 non-destructive idea. Reusing the literal `.rc-sticky` class name is load-bearing, not
 cosmetic: `App.vue`'s `.app-layout:has(.rc-sticky)` selector — which reserves
 `--roster-sticky-h` so `MobileUtilityBar`'s floating buttons rise above this bar instead of
-overlapping it — matches by class name alone, regardless of which view rendered it. **The bar is
+overlapping it — matches by class name alone, regardless of which view rendered it. Those chips
+then float over the list pane's bottom-right corner; the pane pads its scroll end by
+`--mobile-bar-h` (≤900px, `RosterWorkbench.vue`) so the last unit can be pulled clear, and the
+chips' strip is `pointer-events: none` — until 2026-09-19 its empty left half sat over the
+catalogue's «Other units» fold and swallowed the tap. **The bar is
 full-bleed and its CONTENTS are measured** (`.rc-sticky-inner`, the same 860px + 2rem inner both
 `AppSubnav` and `FactionPickerBar` use): the bar is the window's bottom edge, but Save belongs
 under the panel it saves, not in the far corner of a 1500px screen),
@@ -2269,6 +2455,28 @@ unit, for a stated window, when the player decides to. So:
     scope, 12 fall through the "matched nobody" escape (a detachment-granted keyword the datasheets
     do not print — SOUL FORGE, SHADOW LEGION, TANK ACE — or prose our patterns cannot read, "One
     Avatar of Khaine model"), and 44.8% of (unit, stratagem) pairs are dropped.
+  - **"TARGET: That … unit." is a back-reference** (added 2026-09-19, `stratagemTargetScopes`): 80
+    of the 308 stratagems with a modifier name their unit in the WHEN line ("when a friendly
+    HERETIC ASTARTES INFANTRY FLY unit … is selected to fight") and point at it from the TARGET
+    line, which `ruleScopes` reads as nobody — so all 80 were offered to the whole army, and a
+    player found Plunging Talons under his Terminators and Seize the Prize (whose "excluding
+    MONSTERS and VEHICLES" is in its WHEN line) under his Defiler. For a "That …" target the WHEN
+    line is the statement of the target, exclusions and all; the target line read as "Friendly …"
+    is the fallback; a model "in that unit" is the same back-reference. A TARGET line that names
+    its unit without "from your army" ("One GREY KNIGHTS unit that was selected as the target of
+    …", "One friendly unengaged HARLEQUINS unit") is about your own unit by construction, so a line
+    ruleScopes reads as nobody is read once more with "Friendly" in place of its opening count —
+    never past a lowercase "enemy". Measured over ALL 1329 stratagem lines (not only the 308 with
+    a modifier): 1284 → 1323 read; the 6 left ("Your NECRONS WARLORD", "Select one of those Cult
+    Ambush markers", "Your army's Favoured Champions unit") stay fail-open. Over the 308 with a
+    modifier, (unit, stratagem) pairs dropped went 33.4% → 45.7%; the per-stratagem visible sets
+    were diffed by hand (67 changed, every one narrower or wider in the direction the print says —
+    Shield of Faith to all of ADEPTA SORORITAS rather than the 4 JUMP PACK units its "or" clause
+    named). Shared with ruleTargets.js: `[gloss:…]` links unwrapped like `[core:…]`, "friendly
+    unengaged/engaged X", a spaced slash as an in-phrase alternation ("Infantry / Mounted Thousand
+    Sons Psyker" = INFANTRY-PSYKER or MOUNTED-PSYKER), "Battle-shocked" as a stop word, a slash
+    list inside "excluding". NOT shared: "in your army" is not an own-side marker — "within your
+    army's Power Matrix" contains it and would ungate 9 detachment rules through escape 2.
   - the gated list is what the CARD and the CHIPS are both built from (`RosterViewView`'s
     `gatedFor`), so a stratagem that is not on offer cannot appear as a chip, as a note, or as a
     condition switch its `cond` would otherwise have named.

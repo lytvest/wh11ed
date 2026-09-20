@@ -2690,3 +2690,219 @@ ${weapons}`
     expect(report.units[0].points.computed).toBe(165)
   })
 })
+
+// 2026-09-19: 1,817 listhammer lists (every recent GT plus 25 a faction). listhammer strips the
+// indentation from the app's export, so every one of its GW-format lists arrived FLAT — every
+// profile's weapons pooled — and the misreads below were the ones the 157 current-version lists
+// showed. Each fixture is a real list, cut to the unit.
+describe('matchRoster — the listhammer corpus, 2026-09-19', () => {
+  const ctxFor = async (slug) => {
+    const [{ loadRosterFaction }, { default: items }] = await Promise.all([
+      import('../data/roster/index.js'),
+      import('../data/roster/items.js'),
+    ])
+    return { faction: await loadRosterFaction(slug, { allies: true }), core: rosterCore, items: items.items }
+  }
+  const codesOf = async (payload, ctx) => {
+    const { validateRoster } = await import('./rosterValidation.js')
+    return validateRoster(payload, { faction: ctx.faction, core: rosterCore, items: ctx.items }).issues.filter((i) => i.level === 'error').map((i) => i.code)
+  }
+  const gw = (faction, body) => `List (2000 points)\n\n${faction}\nStrike Force (2000 points)\n\nOTHER DATASHEETS\n\n${body}\n\nExported with App Version: v2.6.0 (1), Data Version: v946`
+
+  // The app writes "•" on the model line and "◦" on its weapons; with the indent gone the bullets
+  // still say which is which. Read flat, the Superior's plasma pistol and power weapon were scored
+  // against the squad's bolt pistols and came out as two one-of picks.
+  it('reads the profiles from the bullets when the indentation is gone', async () => {
+    const ctx = await ctxFor('adepta-sororitas')
+    const text = gw('Adepta Sororitas', `Seraphim Squad (75 Points)
+• 1x Seraphim Superior
+◦ 1x Close combat weapon
+◦ 1x Plasma pistol
+◦ 1x Power weapon
+• 4x Seraphim
+◦ 4x Bolt pistol
+◦ 4x Close combat weapon
+◦ 4x Ministorum hand flamer`)
+    const { payload, report } = matchRoster(parseList(text), ctx)
+    expect(report.units[0].gear.missing).toEqual([])
+    expect(await codesOf(payload, ctx)).not.toContain('overWargearLimit')
+    expect(payload.units[0].wg.filter(([gi]) => gi === 0)).toHaveLength(1)   // one Superior swap
+  })
+
+  // A bare line among the bullets is a comment, not a fifth Scout.
+  it('does not count a comment line as a model', async () => {
+    const ctx = await ctxFor('space-marines')
+    const text = gw('Space Marines', `Scout Squad (65 Points)
+• 1x Scout Sergeant
+◦ 1x Astartes chainsword
+◦ 1x Bolt pistol
+◦ 1x Close combat weapon
+• 4x Scout
+One of these losers actually has a missile launcher. -TO edited
+◦ 4x Bolt pistol
+◦ 4x Close combat weapon
+◦ 4x Combat knife`)
+    const { report } = matchRoster(parseList(text), ctx)
+    expect(report.units[0].models).toBe(5)
+    expect(report.units[0].gear.missing).toEqual(['One of these losers actually has a missile launcher. -TO edited'])
+  })
+
+  // The half every bundle of one group shares ("and 1 close combat weapon") identifies none of
+  // them and is not a pick count; two incinerators and two psycannons are four swaps, not six.
+  it('does not count a half shared by every option of the group', async () => {
+    const ctx = await ctxFor('grey-knights')
+    const text = gw('Grey Knights', `Purgation Squad (115 points)
+• 1x Purgator Justicar
+• 1x Nemesis force weapon
+1x Storm bolter
+• 4x Purgator
+• 4x Close combat weapon
+2x Incinerator
+2x Psycannon`)
+    const { payload } = matchRoster(parseList(text), ctx)
+    expect(payload.units[0].wg.map(([, , n]) => n).reduce((a, b) => a + b, 0)).toBe(4)
+    expect(await codesOf(payload, ctx)).not.toContain('overWargearLimit')
+  })
+
+  // A bundle half the list holds MORE of than printed outscores one it holds fewer of, and a
+  // stepper spills past its group's room: three power fists are two inferno-pistol bundles and
+  // the plain chainsword swap.
+  it('places a squad whose swaps span three groups', async () => {
+    const ctx = await ctxFor('blood-angels')
+    const text = gw('Blood Angels', `Death Company Marines with Jump Packs (230 points)
+• 10x Death Company Marine with Jump Packs
+• 5x Astartes chainsword
+2x Eviscerator
+6x Heavy bolt pistol
+2x Inferno pistol
+2x Plasma pistol
+3x Power fist`)
+    const { payload, report } = matchRoster(parseList(text), ctx)
+    expect(report.units[0].gear.missing).toEqual([])
+    expect(await codesOf(payload, ctx)).not.toContain('overWargearLimit')
+    const fists = payload.units[0].wg.filter(([gi, oi]) => {
+      const opt = ctx.faction.units.find((u) => u.id === 'death-company-marines-with-jump-packs').gear[gi].o[oi]
+      return optionItems(opt).some(([id]) => ctx.items[id] === 'Power fist')
+    })
+    expect(fists.map(([, , n]) => n).reduce((a, b) => a + b, 0)).toBe(3)
+  })
+
+  // A group with no cap of its own is one pick per model it belongs to: five twin heavy bolters
+  // and four lascannons on a Stormsword are the lascannon bundle once and the flamer swap once.
+  it('bounds an uncapped single-model group by its models', async () => {
+    const ctx = await ctxFor('astra-militarum')
+    const text = gw('Astra Militarum', `Stormsword (450 points)
+• 1x Armoured tracks
+4x Lascannon
+1x Stormsword siege cannon
+5x Twin heavy bolter`)
+    const { payload } = matchRoster(parseList(text), ctx)
+    expect(payload.units[0].wg.map(([, , n]) => n)).toEqual([1, 1])
+    expect(await codesOf(payload, ctx)).not.toContain('overWargearLimit')
+  })
+
+  // Raptors carry two identical special-weapon groups ("Up to 2 Raptors…" and, at 10 models, "up
+  // to 2 additional"), each one of a kind. The same option offered by two groups is not a shared
+  // half: "1x Meltagun" used to inherit the count of the "2x Close combat weapon" line that had
+  // gone in first and became two meltaguns; a second weapon then opened the 10-model group at 5.
+  it('keeps a 5-model Raptor squad\u2019s meltagun and plasma gun in the one group it has', async () => {
+    const ctx = await ctxFor('chaos-space-marines')
+    const text = gw('Chaos Space Marines', `Raptors (110 points)
+• 1x Raptor Champion
+• 1x Astartes chainsword
+1x Bolt pistol
+• 4x Raptor
+• 4x Bolt pistol
+2x Astartes chainsword
+2x Close combat weapon
+1x Meltagun
+1x Plasma gun`)
+    const { payload } = matchRoster(parseList(text), ctx)
+    const texts = (await import('../data/roster/items.js')).default.texts
+    const def = ctx.faction.units.find((u) => u.id === 'raptors')
+    const gi = def.gear.findIndex((g) => /^Up to 2 Raptors/.test(texts[g.t]))
+    expect(payload.units[0].wg.map(([g, , n]) => [g, n])).toEqual([[gi, 1], [gi, 1]])
+    expect((await codesOf(payload, ctx)).filter((c) => c.startsWith('overWargear'))).toEqual([])
+  })
+
+  it('splits two plasma guns on a 10-model Raptor squad across its two groups', async () => {
+    const ctx = await ctxFor('chaos-space-marines')
+    const text = gw('Chaos Space Marines', `Raptors (210 points)
+• 1x Raptor Champion
+◦ 1x Astartes chainsword
+◦ 1x Bolt pistol
+• 9x Raptor
+◦ 9x Bolt pistol
+◦ 6x Astartes chainsword
+◦ 3x Close combat weapon
+◦ 1x Meltagun
+◦ 2x Plasma gun`)
+    const { payload } = matchRoster(parseList(text), ctx)
+    const byGroup = new Map()
+    for (const [g, , n] of payload.units[0].wg) byGroup.set(g, (byGroup.get(g) || 0) + n)
+    expect([...byGroup.values()].sort()).toEqual([1, 2])
+    expect((await codesOf(payload, ctx)).filter((c) => c.startsWith('overWargear'))).toEqual([])
+  })
+
+  // A weapon two groups offer leaves the group that is the only home of a later line: a
+  // Carnifex's crushing claws may replace either pair of talons, its heavy venom cannon only the
+  // extra pair. Claws first and into the first group filled it, and the cannon had nowhere legal.
+  it('leaves a group to the weapon that has no other home', async () => {
+    const ctx = await ctxFor('tyranids')
+    const text = gw('Tyranids', `Carnifexes (180 points)
+• 2x Carnifex
+• 2x Bio-plasma
+2x Carnifex crushing claws
+2x Chitinous claws and teeth
+2x Heavy venom cannon
+2x Spine banks`)
+    const { payload } = matchRoster(parseList(text), ctx)
+    expect(payload.units[0].wg).toHaveLength(4)
+    expect((await codesOf(payload, ctx)).filter((c) => c.startsWith('overWargear'))).toEqual([])
+  })
+})
+
+describe('parseList — more shapes from the corpus, 2026-09-19', () => {
+  // An older WTC export writes CHARACTER / BATTLELINE headings, or "Attached unit", over its own
+  // "Char1: 1x Name (70 points)" lines — the headings alone must not send it to the app's parser.
+  it('keeps a WTC body with section headings in the WTC parser', () => {
+    const text = `+++++++++++++++++++++++++++++++++++++++++++++++
++ FACTION KEYWORD: Dark Angels
++ DETACHMENT: Company of Hunters
++ TOTAL ARMY POINTS: 1995pts
++++++++++++++++++++++++++++++++++++++++++++++++
+
+CHARACTER
+
+Char1: 1x Chaplain On Bike (70 points) (With Outriders)
+• 1x Chaplain on Bike: Absolvor bolt pistol, Crozius arcanum and Twin bolt rifle
+
+BATTLELINE
+
+6x Outrider Squad (140 points) (With Chaplain)
+• 5x Outrider: 5 with Astartes Chainsword, Heavy Bolt Pistol, Twin bolt rifle
+• 1x Outrider Sergeant: Astartes Chainsword, Heavy Bolt Pistol, Twin bolt rifle`
+    const p = parseList(text)
+    expect(p.units.map((u) => [u.name, u.models])).toEqual([['Chaplain On Bike', 1], ['Outrider Squad', 6]])
+  })
+
+  // A paste from the rendered page loses the parentheses and the space before them.
+  it('reads points glued to the unit name', () => {
+    const text = `Adeptus Custodes
+Lions of the Emperor (3 Detachment Points)
+Strike Force (2,000 Points)
+ATTACHED UNITS
+Attached unit 1
+Shield-Captain on Dawneagle Jetbike170 Points
+• Attached as: Leader (Character)
+• Warlord
+• 1x Interceptor lance
+Vertus Praetors215 Points
+• Attached as: Bodyguard
+• 3x Vertus Praetor
+◦ 3x Interceptor lance`
+    const p = parseList(text)
+    expect(p.units.map((u) => [u.name, u.pts])).toEqual([['Shield-Captain on Dawneagle Jetbike', 170], ['Vertus Praetors', 215]])
+    expect(parseList('Total 2000 Points\n\nNecrons\nStrike Force (2000 points)\n\nOTHER DATASHEETS\n\nImmortals (70 points)').units.map((u) => u.name)).toEqual(['Immortals'])
+  })
+})

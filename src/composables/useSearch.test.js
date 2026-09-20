@@ -193,6 +193,30 @@ describe('datasheet unit search', () => {
     expect(unit).toBeTruthy()
     expect(unit.titleRu).toBe('')
   })
+
+  it('marks a Warhammer Legends sheet so the result can wear the Legends badge', async () => {
+    // Kaldor Draigo comes from the Grey Knights Faction Pack's Legends section; Ghazghkull is
+    // matched-play legal. The flag is the index's fifth slot, so a stale index would fail here.
+    await preloadDatasheetIndex()
+    const draigo = search('draigo', 'en').find((r) => r.route === '/factions/grey-knights/datasheets/kaldor-draigo')
+    expect(draigo).toBeTruthy()
+    expect(draigo.legends).toBe(true)
+    const ghaz = search('ghazghkull', 'en').find((r) => r.route === '/factions/orks/datasheets/ghazghkull-thraka')
+    expect(ghaz.legends).toBe(false)
+  })
+
+  it('finds the Codex sheet a retired Legends unit is fielded as, and says why, in both locales', async () => {
+    // Legendary Proxies (src/data/factionLegends.json): Ufthak Blackhawk has no datasheet of his
+    // own and uses Warboss. The typed name is not the result's title, so the subline carries it.
+    await preloadDatasheetIndex()
+    for (const [locale, label] of [['en', 'Legendary Proxies'], ['ru', 'Legendary Proxies']]) {
+      const res = search('ufthak', locale)
+      const unit = res.find((r) => r.route === '/factions/orks/datasheets/warboss')
+      expect(unit).toBeTruthy()
+      expect(unit.title).toBe('Warboss')
+      expect(unit.titleRu).toBe(`${label}: Ufthak Blackhawk`)
+    }
+  })
 })
 
 describe('faction rules search', () => {

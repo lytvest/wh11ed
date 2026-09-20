@@ -73,13 +73,23 @@
                 >{{ invNoteText(p.invNote) }}</span>
               </div>
             </template>
+            <!-- The Legends mark — the grid's badge, with the same one-line explanation as its
+                 title — lives in the statline's own spare space, right of OC, and costs no row:
+                 it was a sentence under the name plate first, then a badge in the title, and both
+                 pushed the statline down on a phone (2026-09-18). Where the space runs out (a
+                 narrow container, a multi-profile name) it steps down a row — see .ds-legends-tag. -->
+            <span
+              v-if="i === 0 && sheet.legends"
+              class="legends-badge ds-legends-tag"
+              :title="labels.dsLegendsNote"
+            >{{ labels.dsLegends }}</span>
           </div>
         </div>
       </div>
 
       <!-- Weapons -->
       <div
-        v-if="sheet.ranged"
+        v-if="sheet.ranged?.length"
         class="ds-weapons"
       >
         <table>
@@ -162,7 +172,7 @@
         </table>
       </div>
       <div
-        v-if="sheet.melee"
+        v-if="sheet.melee?.length"
         class="ds-weapons"
       >
         <table>
@@ -408,7 +418,7 @@
            accordion here that starts closed is "possible modifiers" above, which is not the
            printed datasheet. -->
         <div
-          v-if="sheet.abilities"
+          v-if="sheet.abilities?.length"
           class="ds-ability-group"
         >
           <DsAccordion :collapsible="collapsible">
@@ -439,10 +449,13 @@
               class="ds-ability"
               :class="{ 'ds-ability-idle': abilityState(a)?.on === false }"
             >
+              <!-- The space after the colon lives INSIDE the strong: the compiler drops whitespace
+                   that spans a line break between two elements, so "Name:Text" is what a bare
+                   newline before the text span renders (a screenshot, 2026-09-19). -->
               <strong>{{ a.name }}<span
                 v-if="a.nameEn"
                 class="ds-name-en"
-              > ({{ a.nameEn }})</span>:</strong>
+              > ({{ a.nameEn }})</span>: </strong>
               <span
                 v-if="abilityState(a)"
                 class="ds-ab-state"
@@ -466,7 +479,7 @@
           </DsAccordion>
         </div>
         <div
-          v-if="sheet.wargearAbilities"
+          v-if="sheet.wargearAbilities?.length"
           class="ds-ability-group"
         >
           <DsAccordion :collapsible="collapsible">
@@ -500,7 +513,7 @@
               <strong>{{ a.name }}<span
                 v-if="a.nameEn"
                 class="ds-name-en"
-              > ({{ a.nameEn }})</span>:</strong>
+              > ({{ a.nameEn }})</span>: </strong>
               <span
                 v-if="abilityState(a)"
                 class="ds-ab-state"
@@ -524,7 +537,7 @@
           </DsAccordion>
         </div>
         <div
-          v-if="sheet.specialAbilities"
+          v-if="sheet.specialAbilities?.length"
           class="ds-ability-group"
         >
           <DsAccordion :collapsible="collapsible">
@@ -558,7 +571,7 @@
               <strong>{{ a.name }}<span
                 v-if="a.nameEn"
                 class="ds-name-en"
-              > ({{ a.nameEn }})</span>:</strong>
+              > ({{ a.nameEn }})</span>: </strong>
               <span
                 v-if="abilityState(a)"
                 class="ds-ab-state"
@@ -625,7 +638,7 @@
               <strong>{{ a.name }}<span
                 v-if="a.nameEn"
                 class="ds-name-en"
-              > ({{ a.nameEn }})</span>:</strong>
+              > ({{ a.nameEn }})</span>: </strong>
               <span
                 v-if="abilityState(a)"
                 class="ds-ab-state"
@@ -1313,9 +1326,20 @@ function abilityStateLabel(st) {
 .ds-statline:has(+ .ds-statline) { margin-bottom: 0.35rem; }
 .ds-stats {
   display: grid;
-  grid-template-columns: repeat(6, max-content) minmax(0, 1fr);
+  /* Six stat columns, the flexible one the multi-profile name starts in, and a last max-content
+     column for the Legends tag — empty (zero wide) on every sheet that has none. */
+  grid-template-columns: repeat(6, max-content) minmax(0, 1fr) max-content;
   gap: 0.35rem;
   align-items: start;
+}
+/* The band's top-right corner: right of OC, level with the stat labels rather than the boxes;
+   the badge's inline margin is for mid-sentence use and is dropped here. */
+.ds-legends-tag {
+  grid-column: 8;
+  grid-row: 1;
+  justify-self: end;
+  align-self: start;
+  margin: 0;
 }
 .ds-stat {
   display: flex;
@@ -1434,6 +1458,18 @@ function abilityStateLabel(st) {
   .ds-stats.has-name .ds-stat { grid-row: 2; }
   .ds-stats.has-name .ds-inv-box { grid-row: 3; }
   .ds-stats.has-name .ds-inv-side { grid-row: 3; }
+  /* …and the Legends tag keeps to the stat row, not the name that now spans the row above. */
+  .ds-stats.has-name .ds-legends-tag { grid-row: 2; }
+}
+/* Narrower still, six boxes fill the row (six at their 2.7rem minimum plus gaps are ~290px, the
+   badge ~60px): the tag steps down beside the invulnerable-save label (which then keeps to the
+   three columns under W/LD/OC) — a row of its own only on a sheet with no invulnerable save,
+   where it is the only thing on that row. 340px is the width where the corner actually runs
+   out; at 400px a 393px phone still had room and stepped down for nothing (2026-09-18). */
+@container dscard (max-width: 340px) {
+  .ds-legends-tag { grid-row: 2; grid-column: 7 / -1; align-self: start; }
+  .ds-stats:has(.ds-legends-tag) .ds-inv-side { grid-column: 4 / 7; }
+  .ds-stats.has-name .ds-legends-tag { grid-row: 3; }
 }
 
 /* Points — closing faction-colour band: bleeds over the card padding (mirroring
@@ -1454,7 +1490,7 @@ function abilityStateLabel(st) {
   color: var(--accent);
   margin: 0 0 0.25rem;
 }
-.ds-points table { border-collapse: collapse; font-size: 0.8rem; }
+.ds-points table { border-collapse: collapse; font-size: 0.8rem; margin: 0; }
 .ds-points th {
   text-align: center;
   font-size: 0.6rem;
@@ -1497,7 +1533,11 @@ function abilityStateLabel(st) {
 /* …but the pill variant carries a border, and 0.3rem from the weapon table's last row reads as
    part of it. Only matters when there is nothing in play and "possible" follows the table alone. */
 .ds-weapons:has(+ .ds-mods-btn) { margin-bottom: 0.55rem; }
-.ds-weapons table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+/* `margin: 0` because style.css gives every `table` a 1rem margin top and bottom — the card's own
+   spacing (--ds-space, the 0.05rem between ranged and melee below) sat ON TOP of 32px of that
+   between the two tables and 16px above and below the pair, unnoticed since the first commit
+   (a player's screenshot, 2026-09-19). The card decides its gaps; the page rule is for prose. */
+.ds-weapons table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 0; }
 .ds-weapons th {
   text-align: center;
   font-size: 0.62rem;

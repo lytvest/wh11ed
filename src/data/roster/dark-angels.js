@@ -247,6 +247,244 @@ export default {
       ]
     },
     {
+      "id": "deathwing-command-squad",
+      "name": "Deathwing Command Squad",
+      "kws": [
+        "Infantry",
+        "Imperium",
+        "Deathwing",
+        "Terminator",
+        "Deathwing Command Squad"
+      ],
+      "flags": {
+        "legends": 1
+      },
+      "sizes": [
+        {
+          "pts": 200,
+          "per": [
+            5,
+            5
+          ],
+          "comp": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "default": 1
+        },
+        {
+          "pts": 400,
+          "per": [
+            6,
+            10
+          ],
+          "comp": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              3,
+              7
+            ]
+          ]
+        }
+      ],
+      "linked": 1,
+      "minis": [
+        {
+          "n": "Deathwing Ancient"
+        },
+        {
+          "n": "Deathwing Apothecary"
+        },
+        {
+          "n": "Deathwing Champion"
+        },
+        {
+          "n": "Deathwing Command Terminators"
+        }
+      ],
+      "defaults": [
+        [
+          0,
+          [
+            [
+              38,
+              1
+            ],
+            [
+              952,
+              1
+            ]
+          ]
+        ],
+        [
+          1,
+          [
+            [
+              38,
+              1
+            ],
+            [
+              1457,
+              1
+            ]
+          ]
+        ],
+        [
+          2,
+          [
+            [
+              2731,
+              1
+            ]
+          ]
+        ],
+        [
+          3,
+          [
+            [
+              38,
+              1
+            ],
+            [
+              952,
+              1
+            ]
+          ]
+        ]
+      ],
+      "gear": [
+        {
+          "m": 3,
+          "t": 1055,
+          "in": "stepper",
+          "o": [
+            [
+              2135
+            ],
+            [
+              [
+                [
+                  2047,
+                  1
+                ],
+                [
+                  2100,
+                  1
+                ]
+              ]
+            ]
+          ],
+          "rep": [
+            38,
+            952
+          ]
+        },
+        {
+          "m": 3,
+          "t": 1056,
+          "in": "stepper",
+          "o": [
+            [
+              1457
+            ]
+          ],
+          "rep": [
+            952
+          ]
+        },
+        {
+          "m": 3,
+          "t": 1057,
+          "in": "checkbox",
+          "o": [
+            [
+              13
+            ]
+          ],
+          "rep": [
+            952
+          ]
+        },
+        {
+          "m": 3,
+          "t": 1058,
+          "in": "stepper",
+          "o": [
+            [
+              2156
+            ],
+            [
+              743
+            ],
+            [
+              1481
+            ],
+            [
+              [
+                [
+                  38,
+                  1
+                ],
+                [
+                  736,
+                  1
+                ]
+              ]
+            ]
+          ],
+          "lim": [
+            [
+              5,
+              1
+            ],
+            [
+              10,
+              2
+            ]
+          ],
+          "rep": [
+            38
+          ]
+        },
+        {
+          "all": 1,
+          "t": 1059,
+          "in": "checkbox",
+          "o": [
+            [
+              1102
+            ]
+          ]
+        }
+      ]
+    },
+    {
       "id": "deathwing-knights",
       "sid": "f522bffd-8580-405a-a4e7-063aed70a553",
       "name": "Deathwing Knights",
@@ -353,6 +591,112 @@ export default {
           "rep": [
             1100
           ]
+        }
+      ]
+    },
+    {
+      "id": "deathwing-strikemaster",
+      "name": "Deathwing Strikemaster",
+      "kws": [
+        "Infantry",
+        "Character",
+        "Imperium",
+        "Deathwing",
+        "Terminator",
+        "Lieutenant",
+        "Deathwing Strikemaster"
+      ],
+      "flags": {
+        "legends": 1,
+        "char": 1
+      },
+      "sizes": [
+        {
+          "pts": 80,
+          "per": [
+            1,
+            1
+          ],
+          "default": 1
+        }
+      ],
+      "linked": 1,
+      "defaults": [
+        [
+          0,
+          [
+            [
+              38,
+              1
+            ],
+            [
+              2062,
+              1
+            ]
+          ]
+        ]
+      ],
+      "gear": [
+        {
+          "m": 0,
+          "t": 1060,
+          "in": "checkbox",
+          "o": [
+            [
+              2135
+            ],
+            [
+              38
+            ],
+            [
+              1457
+            ],
+            [
+              1100
+            ],
+            [
+              952
+            ],
+            [
+              2047
+            ],
+            [
+              2100
+            ]
+          ],
+          "lim": [
+            [
+              0,
+              2,
+              1
+            ]
+          ],
+          "rep": [
+            38,
+            2062
+          ]
+        }
+      ],
+      "leads": [
+        {
+          "to": "deathwing-command-squad",
+          "type": "support"
+        },
+        {
+          "to": "deathwing-terminator-squad",
+          "type": "support"
+        },
+        {
+          "to": "relic-terminator-squad",
+          "type": "support"
+        },
+        {
+          "to": "terminator-assault-squad",
+          "type": "support"
+        },
+        {
+          "to": "terminator-squad",
+          "type": "support"
         }
       ]
     },
@@ -1294,6 +1638,52 @@ export default {
       ]
     },
     {
+      "id": "ravenwing-talonmaster",
+      "name": "Ravenwing Talonmaster",
+      "kws": [
+        "Vehicle",
+        "Character",
+        "Fly",
+        "Imperium",
+        "Ravenwing",
+        "Ravenwing Talonmaster"
+      ],
+      "flags": {
+        "legends": 1,
+        "char": 1
+      },
+      "sizes": [
+        {
+          "pts": 105,
+          "per": [
+            1,
+            1
+          ],
+          "default": 1
+        }
+      ],
+      "linked": 1,
+      "defaults": [
+        [
+          0,
+          [
+            [
+              711,
+              1
+            ],
+            [
+              60,
+              1
+            ],
+            [
+              13,
+              1
+            ]
+          ]
+        ]
+      ]
+    },
+    {
       "id": "sammael",
       "sid": "10040480-4f18-442e-9762-a47d3d4d61aa",
       "name": "Sammael",
@@ -1944,34 +2334,57 @@ export default {
     "aggressor-squad",
     "ancient",
     "ancient-in-terminator-armour",
+    "ancient-on-bike",
     "apothecary",
     "apothecary-biologis",
+    "apothecary-on-bike",
     "assault-intercessor-squad",
     "assault-intercessors-with-jump-packs",
+    "assault-squad",
+    "assault-squad-with-jump-packs",
+    "astartes-servitors",
     "astraeus",
+    "attack-bike-squad",
     "ballistus-dreadnought",
+    "bike-squad",
     "bladeguard-ancient",
     "bladeguard-veteran-squad",
     "brutalis-dreadnought",
+    "caestus-assault-ram",
     "captain",
     "captain-in-gravis-armour",
     "captain-in-phobos-armour",
     "captain-in-terminator-armour",
+    "captain-on-bike",
     "captain-with-jump-pack",
+    "carab-culln-the-risen",
     "centurion-assault-squad",
     "centurion-devastator-squad",
+    "cerberus",
     "chaplain",
     "chaplain-in-terminator-armour",
     "chaplain-on-bike",
+    "chaplain-venerable-dreadnought",
     "chaplain-with-jump-pack",
+    "command-squad",
+    "company-champion-on-bike",
     "company-heroes",
+    "company-veterans-on-bikes",
+    "deathstorm-drop-pod",
+    "deimos-predator",
+    "deredeo-dreadnought",
     "desolation-squad",
     "devastator-squad",
     "dreadnought",
+    "dreadnought-drop-pod",
     "drop-pod",
     "eliminator-squad",
     "eradicator-squad",
     "eradicator-squad-with-heavy-bolters",
+    "falchion",
+    "fellblade",
+    "ferren-areios",
+    "fire-raptor-gunship",
     "firestrike-servo-turrets",
     "gladiator-lancer",
     "gladiator-reaper",
@@ -1979,6 +2392,8 @@ export default {
     "hammerfall-bunker",
     "heavy-intercessor-squad",
     "hellblaster-squad",
+    "hunter",
+    "imperial-space-marine",
     "impulsor",
     "inceptor-squad",
     "incursor-squad",
@@ -1987,29 +2402,63 @@ export default {
     "intercessor-squad",
     "invader-atv",
     "invictor-tactical-warsuit",
+    "ironclad-dreadnought",
+    "javelin-attack-speeder",
     "judiciar",
+    "kratos",
     "land-raider",
+    "land-raider-achilles",
     "land-raider-crusader",
+    "land-raider-excelsior",
+    "land-raider-helios",
+    "land-raider-prometheus",
+    "land-raider-proteus",
     "land-raider-redeemer",
     "land-speeder",
+    "land-speeder-storm",
+    "land-speeder-tempest",
+    "land-speeder-tornado",
+    "land-speeder-typhoon",
+    "leviathan-dreadnought",
     "librarian",
     "librarian-in-phobos-armour",
     "librarian-in-terminator-armour",
+    "librarian-on-bike",
+    "librarian-with-jump-pack",
     "lieutenant",
     "lieutenant-in-phobos-armour",
     "lieutenant-in-reiver-armour",
     "lieutenant-with-combi-weapon",
+    "mastodon",
+    "mortis-dreadnought",
     "outrider-squad",
     "predator-annihilator",
     "predator-destructor",
+    "primaris-company-champion",
+    "rapier-carrier",
     "razorback",
     "redemptor-dreadnought",
     "reiver-squad",
+    "relic-contemptor-dreadnought",
+    "relic-razorback",
+    "relic-terminator-squad",
     "repulsor",
     "repulsor-executioner",
     "rhino",
+    "rhino-primaris",
+    "scout-bike-squad",
+    "scout-sniper-squad",
     "scout-squad",
+    "sicaran-arcus",
+    "sicaran-battle-tank",
+    "sicaran-omega",
+    "sicaran-punisher",
+    "sicaran-venator",
+    "sokar-pattern-stormbird",
+    "spartan",
+    "stalker",
     "sternguard-veteran-squad",
+    "storm-eagle-gunship",
     "storm-speeder-hailstrike",
     "storm-speeder-hammerstrike",
     "storm-speeder-thunderstrike",
@@ -2018,13 +2467,26 @@ export default {
     "stormtalon-gunship",
     "suppressor-squad",
     "tactical-squad",
+    "tarantula-air-defence-battery",
+    "tarantula-sentry-battery",
     "techmarine",
+    "techmarine-on-bike",
     "terminator-assault-squad",
     "terminator-squad",
+    "terminus-ultra",
+    "terrax-pattern-termite",
+    "thunderfire-cannon",
     "thunderhawk-gunship",
+    "thunderhawk-transporter",
+    "typhon",
+    "vanguard-veteran-squad",
     "vanguard-veteran-squad-with-jump-packs",
+    "venerable-dreadnought",
     "vindicator",
-    "whirlwind"
+    "vindicator-laser-destroyer",
+    "whirlwind",
+    "whirlwind-scorpius",
+    "xiphon-interceptor"
   ],
   "unitPoints": {
     "centurion-devastator-squad": {

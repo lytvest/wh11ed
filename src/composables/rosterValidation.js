@@ -3,7 +3,7 @@
 // than preventing an illegal list. Each issue is `{ code, level, uid?, params? }`; `code` maps
 // to an i18n message (see RosterIssuesModal), `level` is 'error' (illegal) or 'warn'
 // (incomplete / soft). `uid` ties an issue to a specific unit entry.
-import { hasKeyword, isBattlelineNow, grantedKeywordsFor, hostLimitsFor, leadTypeFor, allyGroupsFor, allyGroupsOf, allySourceOf, canBeWarlord, enhEligible, findEnhancement, rosterPoints, effectiveBattle, capKeyOf, wargearGroupCap, wargearGroupFallbackCap, wargearGroupLive, wargearGroupSpent, allegFor, allegKeyword, grantedKeywords, dispositionCandidates, dispositionOf } from './rosterEngine.js'
+import { hasKeyword, isBattlelineNow, grantedKeywordsFor, hostLimitsFor, leadTypeFor, allyGroupsFor, allyGroupsOf, allySourceOf, canBeWarlord, enhEligible, findEnhancement, rosterPoints, effectiveBattle, capKeyOf, wargearGroupCap, wargearGroupFallbackCap, wargearGroupLive, wargearGroupSpent, swapOverdraft, allegFor, allegKeyword, grantedKeywords, dispositionCandidates, dispositionOf } from './rosterEngine.js'
 
 // Per-unit duplicate cap: the battle size's limit, doubled for Battleline / Dedicated Transport,
 // and hard-capped at 1 for every Epic Hero — regardless of battle size (rule 25).
@@ -32,7 +32,9 @@ export function duplicateCounts(units, defOf) {
   return m
 }
 
-export function validateRoster(roster, { faction, core } = {}) {
+// `items` (the shared wargear-name dictionary, data/roster/items.js) is optional: only the stock
+// rule's message names an item, and a caller that merely counts errors need not carry it.
+export function validateRoster(roster, { faction, core, items } = {}) {
   const units = roster?.units || []
   const defMap = new Map((faction?.units || []).map((u) => [u.id, u]))
   const defOf = (id) => defMap.get(id)
@@ -177,6 +179,13 @@ export function validateRoster(roster, { faction, core } = {}) {
       const over = cap.dup && (u.wg || []).find(([g, , n]) => g === gi && (n || 1) > cap.dup)
       if (over) add('overWargearDup', 'error', { uid: u.uid, params: { count: over[2] || 1, limit: cap.dup } })
     }
+    // The stock rule: the same item given up by more models than carry it — two groups each
+    // swapping a Chaos Lord's one bolt pistol. The editor greys such a group out before it is
+    // picked (rosterEngine's swapRoom), so this is for lists built before the rule, imported, or
+    // shrunk under their swaps. Which swap to undo is the player's call.
+    for (const { id, used, cap: have } of swapOverdraft(def, u)) {
+      add('overWargearReplaced', 'error', { uid: u.uid, params: { item: items?.[id] || '', count: used, limit: have } })
+    }
   }
 
   // Allegiance choices — the mark a unit must pick, and the army-wide cap on the optional upgrades.
@@ -271,11 +280,23 @@ export function validateRoster(roster, { faction, core } = {}) {
     const limit = findEnhancement(detachments, name)?.limit || 1
     for (const u of list.slice(limit)) add('dupEnh', 'error', { uid: u.uid, params: { enh: name } })
   }
+  // The army-wide limit counts an Upgrade ONCE however many units carry it — the muster rules:
+  // "the second and third instances of the same Upgrade do not count towards the total number of
+  // enhancements in your army" (they still cost points, and still cap at `limit`, above). Three
+  // Land Speeders with Nightforged Battery and three with Thundercowl Turbines are two slots, not
+  // six; eight tournament lists at v946 said so before the count did (2026-09-19).
   if (detachments.length) {
-    const counted = enhUnits.filter((u) => {
+    const seenUpgrades = new Set()
+    let counted = 0
+    for (const u of enhUnits) {
       const e = findEnhancement(detachments, u.enh)
-      return e && !e.uncounted
-    }).length
+      if (!e || e.uncounted) continue
+      if (e.type === 'upgrade') {
+        if (seenUpgrades.has(u.enh)) continue
+        seenUpgrades.add(u.enh)
+      }
+      counted++
+    }
     if (counted > battle.enhLimit) add('overEnhLimit', 'error', { params: { count: counted, limit: battle.enhLimit } })
   }
   for (const u of enhUnits) {

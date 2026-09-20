@@ -113,6 +113,26 @@ describe('validateRoster — wargear pick limits', () => {
     expect(iss.uid).toBe(u.uid)
   })
 
+  it('flags an item given up by more models than carry it', () => {
+    const lord = {
+      id: 'lord', name: 'Lord', kws: ['Character', 'Infantry'], flags: { char: 1 },
+      sizes: [{ pts: 80, per: [1, 1], default: 1 }],
+      defaults: [[0, [[22, 1], [949, 1]]]],
+      gear: [
+        { m: 0, t: 1, in: 'checkbox', o: [[25]], rep: [22] },
+        { m: 0, t: 2, in: 'checkbox', o: [[954]], rep: [22, 949] },
+      ],
+    }
+    const ff = { ...faction, units: [...faction.units, lord] }
+    const items = { 22: 'Bolt pistol', 949: 'Accursed weapon' }
+    const run = (wg) => validateRoster(roster({ units: [{ ...U('lord', { size: 0, wg }), warlord: true }] }), { faction: ff, core, items })
+      .issues.filter((i) => i.code === 'overWargearReplaced')
+    expect(run([[1, 0, 1]])).toHaveLength(0)
+    const [iss] = run([[0, 0, 1], [1, 0, 1]])
+    expect(iss.level).toBe('error')
+    expect(iss.params).toMatchObject({ item: 'Bolt pistol', count: 2, limit: 1 })
+  })
+
   it('caps an uncapped group by the profile it belongs to', () => {
     // No wargear_limit for this one, so the ceiling is the number of models that can take it —
     // the rank-and-file profile, not the squad (a 10-model unit with one leader allows 9).
@@ -309,6 +329,30 @@ describe('validateRoster — enhancements', () => {
       U('chaplain', { enh: 'Enlivened Sentinels' }),
       U('marneus', { enh: 'Enlivened Sentinels' }),
     ])).toContain('dupEnh')
+  })
+  // Muster rules: "the second and third instances of the same Upgrade do not count towards the
+  // total number of enhancements in your army". Three Land Speeders with one Upgrade and three
+  // with another are two slots — eight v946 tournament lists were flagged before this counted so.
+  it('counts an "(Upgrade)" once toward the army limit however many units carry it', () => {
+    const det2 = { ...detachment, enhancements: [...detachment.enhancements,
+      { name: 'Enlivened Sentinels', pts: 20, type: 'upgrade', limit: 3, req: [{ kw: ['Infantry'] }] },
+      { name: 'Ward of Iron', pts: 10, type: 'upgrade', limit: 3, req: [{ kw: ['Infantry'] }] }] }
+    const f = { ...faction, detachments: [det2] }
+    const inc = (units) => validateRoster({ ...roster({ units }), battleSize: 'incursion' }, { faction: f, core }).issues.map((i) => i.code)
+    // Incursion enhLimit = 2: two Upgrades on five units are two slots.
+    expect(inc([
+      U('captain', { warlord: true, enh: 'Enlivened Sentinels' }),
+      U('lieutenant', { enh: 'Enlivened Sentinels' }),
+      U('chaplain', { enh: 'Enlivened Sentinels' }),
+      U('lieutenant', { enh: 'Ward of Iron' }),
+      U('chaplain', { enh: 'Ward of Iron' }),
+    ])).not.toContain('overEnhLimit')
+    // …and an ordinary enhancement on top is the third slot.
+    expect(inc([
+      U('captain', { warlord: true, enh: 'Enlivened Sentinels' }),
+      U('lieutenant', { enh: 'Ward of Iron' }),
+      U('chaplain', { enh: 'Artificer Armour' }),
+    ])).toContain('overEnhLimit')
   })
   // "No unit (including attached units) can have more than one enhancement" — every other check
   // here asks about ONE entry, and two enhancement-carrying Leaders on the same bodyguard unit is
@@ -778,7 +822,7 @@ describe('validateRoster — every issue says which unit it is about', () => {
   it('asks for nothing the validator does not send', async () => {
     const { ui } = await import('../i18n/ui.js')
     const known = new Set(['unit', 'target', 'id', 'count', 'limit', 'over', 'spent', 'group',
-      'names', 'tag', 'enh', 'dets', 'points', 'kw', 'kws', 'own', 'theirs', 'options'])
+      'names', 'tag', 'enh', 'dets', 'points', 'kw', 'kws', 'own', 'theirs', 'options', 'item'])
     for (const loc of ['en', 'ru']) {
       for (const [key, tpl] of Object.entries(ui[loc])) {
         if (!key.startsWith('issue_')) continue
