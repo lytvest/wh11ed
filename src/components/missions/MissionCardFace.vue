@@ -218,6 +218,7 @@ function deckTag(kind) {
 const { cardRef, bodyRef } = useFitText([
   toRef(props, 'mission'),
   toRef(props, 'side'),
+  locale,
 ])
 
 defineExpose({ cardRef, bodyRef })
