@@ -1,10 +1,11 @@
 # CLAUDE.md — `src/components/`
 
 The house rules for anything visual: motion, the shared primitives in `style.css`, modal chrome,
-square corners, and what the phone this is read on demands. They apply to every component in this
-tree — a feature with its own directory (`core/`, `event/`, `tracker/`, `roster/`) adds to them,
-never contradicts them. Two of the rules here are enforced by gates: `npm run radii` and
-`npm run dupes`.
+square corners, where the palette and type scale live, and what the phone this is read on
+demands. They apply to every component in this tree — a feature with its own directory (`core/`,
+`event/`, `tracker/`, `roster/`) adds to them, never contradicts them. Three of the rules here are
+enforced by gates: `npm run radii` and `npm run dupes` read the stylesheets, `npm run a11y` reads
+the screen.
 
 ## Motion & animations
 
@@ -92,6 +93,14 @@ it actually changes). `npm run dupes` fails when one rule body appears verbatim 
 
 Every dialog is a `BaseModal` (teleported to `<body>`, `useModalA11y` for focus/Escape).
 
+- **The phone's Back closes the dialog, not the app** — `useBackToClose.js`, wired through
+  `useModalA11y` (so every `BaseModal`/`ConfirmModal`/`SearchModal` gets it) and, for the nav
+  drawer that stays mounted, `useBackToCloseWhile(ref)` in `App.vue`. Opening pushes a copy of the
+  current history entry; Back pops it. A dialog that closes and navigates in one go (search) leaves
+  a dead copy behind on purpose — the listener steps over it — so don't "fix" the deferred self-pop
+  into a synchronous `history.back()`: that undoes the navigation. A dropdown (settings, account
+  menu) or the keyword popover is not a page and does not get this.
+
 - **The header chrome is global, in `style.css` ("Modal chrome"): `.modal-head`, `.mh-title`,
   `.mh-sub`, `.mh-right`, `.mh-close`.** Not scoped to `BaseModal`, and this is the whole point:
   a consumer's own `<template #header>` renders in **its** scope, which BaseModal's scoped rules
@@ -142,7 +151,58 @@ has to earn its place, and `npm run radii` fails the build of anyone who forgets
   told from its background by `--border`/`--bg-card`, so don't drop a border "because it looks
   flat" — that is the only thing separating two panels now.
 
-## The phone this is read on
+## Palette & type live in `style.css`, not here
+
+There is no separate style passport: the design tokens at the top of `src/style.css` are it.
+Read that `:root` block before styling anything new — it is short and it answers every "which
+colour / which face / how big" question.
+
+- **Colour** — `--bg-*` surfaces, `--accent` (the house oxblood), `--text-*`, `--border*`, the
+  ability tints (`--ability-weapon` / `--ability-unit`) and the sub-rule set. There is a dark
+  theme (`:root[data-theme='dark']` further down the same file), so a hex literal in a component
+  is a colour that will not change with the theme — write `var(--token)` unless the surface is
+  always-dark on purpose. `FactionAccentScope` re-points `--accent` per faction; that is the
+  extension mechanism, not a licence to hard-code faction colours.
+- **`--danger`** is the one red that means "something is wrong": points over budget, issue
+  badges, validation errors, losses, destructive hover. Until 2026-09-21 it had no token and sat
+  as `#c0392b` (or its bootstrap cousin `#d9534f`) in 17 files, each with — or, more often,
+  without — its own dark-theme override; now the token carries the dark shade itself, so a
+  component never writes a `[data-theme='dark']` rule just to brighten a red. Not every red is
+  danger: `StratCard`'s opponent-turn tint is a turn colour and keeps its own value.
+- **Type** — `--font-display` (Sofia Sans Extra Condensed) on every heading and title,
+  `--font-sans` (Inter) on everything else, `--font-serif` (EB Garamond) only on lore flavour
+  text. The heading scale is `--fs-*` / `--fw-heading`; new headings pick a step, they don't
+  invent a size. `font-family: inherit` on buttons/inputs is fine (it is undoing the UA default).
+- **Layout constants** — `--navbar-height`, `--subnav-height`, `--header-total`,
+  `--sidebar-width`, the `--safe-*` insets. Anything that must line up with the chrome
+  references these rather than repeating `56px`.
+
+## `npm run a11y` — the gate that looks at the rendered page
+
+`radii` and `dupes` read source; nothing read the screen until 2026-09-21, which is how ~15 error
+states sat dark-maroon on the dark theme for months (the `--danger` story above). `npm run a11y`
+(`scripts/check-a11y.mjs`) builds nothing — it needs a fresh `dist/` — then drives the installed
+Google Chrome through `playwright-core` over 18 routes × EN/RU × light/dark × 390/1280px and
+measures three things from computed styles and real geometry:
+
+- **Contrast** — WCAG AA, 4.5:1 for text and 3:1 for large text, resting state only. Text over a
+  background-image is skipped (not computable), so are disabled controls.
+- **Tap targets** — 24×24px minimum, with WCAG's own two exceptions: inline links in running text,
+  and a small control with nothing else to hit within 24px of its centre.
+- **Overflow** — the document never scrolls sideways; the widest offenders are named.
+
+Findings are keyed by theme + element signature + colour pair, not by page — a bad token pair is
+one finding however many pages carry it, and fixing the token clears them all. **The baseline**
+(`scripts/lib/a11y-baseline.json`, 124 entries after the first pass) holds what the palette itself
+was short of AA on that day: `--text-dim` on every surface (2.6–3.2:1), the dark `--accent` as
+text (2.8–3.7:1) and as a button ground under white (4.2:1), `--text-muted` on `--bg-secondary`
+(4.24:1), a faction's own green as chip text. Those are palette decisions, still a fix each; the
+gate is red only on something new. A baseline entry that stops firing is reported as stale, so
+the file shrinks as the palette is fixed; `--baseline` re-records it — read the diff first.
+
+Tracker and roster screens that need a game or a list in storage are not in the route sample on
+purpose: a check that has to seed state to render is a test and lives in vitest.
+
 
 Most readers are on a phone at a table, and a large share of those are on iOS Safari. That is not
 a browser to test last — WebKit's differences here are not cosmetic, they lose data and hide

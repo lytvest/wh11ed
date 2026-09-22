@@ -229,6 +229,16 @@
             <em class="check-note">{{ labels.rosterCheckLegalityNote }}</em>
           </span>
         </label>
+        <label
+          class="check"
+          :class="{ on: showPointsLeft }"
+        >
+          <input
+            v-model="showPointsLeft"
+            type="checkbox"
+          >
+          <span>{{ labels.rosterShowPointsLeft }}</span>
+        </label>
       </div>
     </div>
 
@@ -331,8 +341,12 @@
         >
           <span
             class="rc-points"
+            :class="{ over: points > limit, 'with-left': showPointsLeft }"
+          >{{ points }} / {{ limit }}<span
+            v-if="showPointsLeft"
+            class="pts-left"
             :class="{ over: points > limit }"
-          >{{ points }} / {{ limit }}</span>
+          >{{ pointsLeftLabel(points, limit, labels) }}</span></span>
           <button
             type="button"
             class="issues-badge"
@@ -445,10 +459,11 @@ import { useFactionAccent } from '../../composables/useFactionAccent.js'
 import { summaryOf } from '../../composables/rosterSummary.js'
 import { useRosterSync } from '../../composables/useRosterSync.js'
 import { forgetDraft, rememberDraft } from '../../composables/useRosterDraftResume.js'
+import { useRosterPrefs } from '../../composables/useRosterPrefs.js'
 import rosterCore from '../../data/roster/core.js'
 import { loadRosterFaction, rosterItems } from '../../data/roster/index.js'
 import {
-  ROSTER_NOTES_MAX, addUnitEntry, duplicateUnitEntry, removeUnitEntry, dispositionCandidates,
+  ROSTER_NOTES_MAX, addUnitEntry, duplicateUnitEntry, removeUnitEntry, dispositionCandidates, pointsLeftLabel,
 } from '../../composables/rosterEngine.js'
 import { useMediaQuery } from '../../composables/useMediaQuery.js'
 
@@ -472,6 +487,7 @@ const disposition = ref(null)
 const battleSize = ref('strike-force')
 const customPoints = ref(2000)
 const checkLegality = ref(true)
+const { showPointsLeft } = useRosterPrefs()
 const notes = ref('')
 const units = ref([])
 
@@ -808,7 +824,7 @@ watchEffect(() => {
   font-weight: 700;
   margin-left: 0.3rem;
 }
-.dp-count.over { color: #c0392b; }
+.dp-count.over { color: var(--danger); }
 .det-empty { font-size: 0.82rem; color: var(--text-dim); font-style: italic; margin: 0.25rem 0 0; }
 .dp-help-text { margin: 0; font-size: 0.88rem; line-height: 1.5; color: var(--text-muted); }
 

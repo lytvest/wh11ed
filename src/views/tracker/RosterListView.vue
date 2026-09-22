@@ -96,10 +96,26 @@
             <i class="bi bi-three-dots-vertical" />
           </button>
         </div>
-        <span
+        <!-- The army's Force Disposition rides on the faction line as the same coloured chip the
+             tracker's detachment picker uses, and the detachment(s) sit under it in quiet grey —
+             so a list can be told from its neighbours by what it fields, and the name is free to
+             be a joke (player request, 2026-09-21). The chip needs the MFM to know a detachment's
+             disposition; until that lazy load lands the line simply has no chip. -->
+        <div
           v-if="factionOf(r)"
-          class="rfaction"
-        >{{ factionOf(r).name }}</span>
+          class="rline"
+        >
+          <span class="rfaction">{{ factionOf(r).name }}</span>
+          <span
+            v-if="fdOf(r)"
+            class="tone tone-chip rfd"
+            :style="toneOf(r)"
+          >{{ fdOf(r) }}</span>
+        </div>
+        <span
+          v-if="r.detachments?.length"
+          class="rdets"
+        >{{ r.detachments.join(', ') }}</span>
         <div class="roster-meta">
           <span class="meta-left">
             <span
@@ -229,7 +245,8 @@ import { useRosters } from '../../composables/useRosters.js'
 import { useRosterSync } from '../../composables/useRosterSync.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { useFormatDate } from '../../composables/useFormatDate.js'
-import { effectiveBattle, usesAllies } from '../../composables/rosterEngine.js'
+import { dispositionOf, effectiveBattle, usesAllies } from '../../composables/rosterEngine.js'
+import { dispositionColor } from '../../data/dispositionColors.js'
 import { refreshSummaries } from '../../composables/rosterSummary.js'
 import rosterCore from '../../data/roster/core.js'
 import { rosterItems } from '../../data/roster/index.js'
@@ -319,6 +336,22 @@ function cardStyle(r) {
   return c ? { '--fa-light': c.light, '--fa-dark': c.dark } : {}
 }
 function limitOf(r) { return effectiveBattle(r, rosterCore).points }
+
+// Detachment names are already on the record; their Force Disposition is not — that is MFM
+// data (~290 KB), so it is fetched after mount, the way the setup wizard does, and the chips
+// appear when it lands. A name the MFM no longer knows (renamed in a points update) just has no
+// disposition — the line still prints what the list says it fields.
+const mfm = ref(null)
+onMounted(() => { import('../../data/mfmFactions.js').then((m) => { mfm.value = m.mfmFactions.en }) })
+function fdOf(r) {
+  const known = mfm.value?.find((f) => f.slug === r.faction)?.detachments || []
+  const dets = (r.detachments || []).map((n) => known.find((d) => d.name === n)).filter(Boolean)
+  return dispositionOf(r, dets.map((d) => ({ fd: d.forceDisposition })))
+}
+function toneOf(r) {
+  const c = dispositionColor(fdOf(r))
+  return c ? { '--tone-light': c.light, '--tone-dark': c.dark } : undefined
+}
 
 // A saved list opens read-only; a draft goes back to the wizard, which resumes it from the id in
 // this query and lands on the step it was left on (RosterCreateView.vue).
@@ -469,13 +502,18 @@ function confirmDelete() {
 @media (hover: hover) { .kebab:hover { background: color-mix(in srgb, var(--text-primary) 8%, transparent); color: var(--text-primary); } }
 /* The draft's own Delete: same hit area as the kebab it replaces, and it says what it does only
    on hover — a bin sitting bright red on every draft card would shout louder than the card. */
-@media (hover: hover) { .kebab.danger:hover { background: color-mix(in srgb, #d9534f 14%, transparent); color: #d9534f; } }
-.rfaction { display: block; margin-top: 0.05rem; font-size: 0.78rem; font-weight: 600; color: var(--fa-light, var(--accent)); opacity: 0.7; }
+@media (hover: hover) { .kebab.danger:hover { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); } }
+/* Faction on the left, the disposition chip pinned right; the detachments under them, one step
+   quieter than the faction — a fact to check, not a headline. */
+.rline { display: flex; align-items: flex-start; gap: 0.45rem; margin-top: 0.05rem; }
+.rfaction { flex: 1 1 auto; min-width: 0; font-size: 0.78rem; font-weight: 600; color: var(--fa-light, var(--accent)); opacity: 0.7; }
+.rfd { flex-shrink: 0; margin-top: 0.1rem; }
+.rdets { display: block; font-size: 0.72rem; color: var(--text-muted); opacity: 0.8; }
 @media (prefers-color-scheme: dark) {
   .rfaction { color: var(--fa-dark, var(--accent)); }
 }
 .rpoints { font-family: var(--font-mono); font-weight: 700; color: var(--text-primary); white-space: nowrap; }
-.rpoints.over { color: #c0392b; }
+.rpoints.over { color: var(--danger); }
 .rpoints .unit { font-size: 0.62rem; color: var(--text-dim); margin-left: 0.15rem; }
 .roster-meta {
   display: flex;

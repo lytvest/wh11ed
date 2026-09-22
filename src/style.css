@@ -27,6 +27,9 @@
   --bg-row-hover: rgba(139, 42, 51, 0.05);
   --ability-weapon: #7a5a00;
   --ability-unit: #004a6e;
+  /* The one "something is wrong" red: points over budget, validation errors, losses,
+     destructive hover. Every red that means danger goes through this — not a literal. */
+  --danger: #c0392b;
   --bg-definition: #cfd0c3;
   --bg-definition-border: #b8b9ac;
   --sub-rule-bg: #eef0e5;
@@ -207,6 +210,7 @@
   --bg-row-hover: rgba(200, 88, 94, 0.10);
   --ability-weapon: #e0b850;
   --ability-unit: #5fb2dc;
+  --danger: #ef6e60;
   --bg-definition: #2a2d2c;
   --bg-definition-border: #3a3d3c;
   --sub-rule-bg: #292b21;
@@ -295,11 +299,14 @@ a {
   }
 }
 
-.color-red   { color: #c0392b; }
+/* `{red:TEXT}` markup renders a coloured <strong>. Written with the theme attribute on purpose:
+   `[data-theme='dark'] strong` below recolours every strong to near-white, and a bare `.color-red`
+   loses to it — the RED unit in the shooting example went white on 2026-09-21 when the dark
+   `.color-red` override was folded into the `--danger` token. */
+:root .color-red   { color: var(--danger); }
 .color-blue  { color: #2471a3; }
 .color-green { color: #1e8449; }
 
-[data-theme='dark'] .color-red   { color: #ef6e60; }
 [data-theme='dark'] .color-blue  { color: #6aa9d6; }
 [data-theme='dark'] .color-green { color: #5cbf83; }
 
@@ -812,8 +819,22 @@ strong {
 /* margin-left, not just the inner's space-between: the creation wizard's step 1 puts nothing on
    the bar but its Next button, and a lone child under space-between sits at the LEFT edge. */
 .rc-sticky-actions { display: flex; gap: 0.5rem; margin-left: auto; }
-.rc-points { font-family: var(--font-mono); font-weight: 700; color: var(--text-primary); }
-.rc-points.over { color: #c0392b; }
+.rc-points { display: flex; flex-direction: column; justify-content: center; font-family: var(--font-mono); font-weight: 700; color: var(--text-primary); }
+.rc-points.over { color: var(--danger); }
+/* With the remainder on, the total steps down a size so the two lines together are no taller
+   than the buttons beside them; the badge beside it grows to the height of both lines (1.9rem
+   is what 0.9rem + 0.68rem of text come to) — and grows in proportion, a square with a mark a
+   quarter bigger, not a tall sliver around a small one. */
+.rc-points.with-left { font-size: 0.9rem; line-height: 1.15; }
+.rc-points.with-left + .issues-badge { height: 1.9rem; min-width: 1.9rem; justify-content: center; padding: 0 0.4rem; font-size: 1.05rem; }
+/* What is left of the budget, beside the "used / limit" readout while a list is being BUILT (the
+   settings bar and the two sticky bars) — the number a player subtracts in their head at every
+   add, so it is printed (player request, 2026-09-21). Not on the read-only view: a finished list
+   is read for what it fields, not for what it could still take (owner, same day). A second line
+   under the total, in words ("125 left"): a bare number after "1995 / 2000" read as part of it.
+   The deficit is red like the total it belongs to. */
+.pts-left { display: block; margin-top: 0.1rem; font-family: var(--font-sans); font-size: 0.68rem; font-weight: 500; line-height: 1.1; color: var(--text-muted); white-space: nowrap; }
+.pts-left.over { color: var(--danger); }
 
 .issues-badge {
   display: inline-flex;
@@ -828,7 +849,7 @@ strong {
   cursor: pointer;
 }
 
-.issues-badge.has-err { color: #c0392b; border-color: color-mix(in srgb, #c0392b 45%, var(--border)); }
+.issues-badge.has-err { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); }
 .issues-badge.ok { color: #3c9a5f; }
 
 /* Legends mark — says a datasheet sits on the Legends shelf rather than the matched-play one.
@@ -1248,10 +1269,10 @@ a.btn-ghost { color: var(--text-muted); text-decoration: none; }
   background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;
   font-size: 0.88rem; font-weight: 600; text-align: left;
 }
-.act-danger { color: #c0392b; }
+.act-danger { color: var(--danger); }
 @media (hover: hover) {
   .act-btn:hover { border-color: var(--accent); }
-  .act-danger:hover { border-color: #c0392b; background: color-mix(in srgb, #c0392b 8%, transparent); }
+  .act-danger:hover { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 8%, transparent); }
 }
 
 /* A body that is a LIST of choices rather than prose — the faction/detachment/keyword pickers. */

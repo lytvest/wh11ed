@@ -128,8 +128,12 @@
     <div class="rw-tally">
       <span
         class="rw-points"
+        :class="{ over: points > limit, 'with-left': showPointsLeft }"
+      >{{ points }} / {{ limit }}<span
+        v-if="showPointsLeft"
+        class="pts-left"
         :class="{ over: points > limit }"
-      >{{ points }} / {{ limit }}</span>
+      >{{ leftLabel }}</span></span>
       <button
         v-if="factionSlug"
         type="button"
@@ -216,6 +220,16 @@
             <em class="check-note">{{ labels.rosterCheckLegalityNote }}</em>
           </span>
         </label>
+        <label
+          class="check"
+          :class="{ on: showPointsLeft }"
+        >
+          <input
+            v-model="showPointsLeft"
+            type="checkbox"
+          >
+          <span>{{ labels.rosterShowPointsLeft }}</span>
+        </label>
       </div>
     </BaseModal>
   </div>
@@ -228,9 +242,10 @@ import FactionPickerModal from '../tracker/FactionPickerModal.vue'
 import DetachmentPickerModal from '../tracker/DetachmentPickerModal.vue'
 import { ui } from '../../i18n/ui.js'
 import { useLocale } from '../../composables/useLocale.js'
-import { ROSTER_NOTES_MAX } from '../../composables/rosterEngine.js'
+import { ROSTER_NOTES_MAX, pointsLeftLabel } from '../../composables/rosterEngine.js'
+import { useRosterPrefs } from '../../composables/useRosterPrefs.js'
 
-defineProps({
+const props = defineProps({
   showName: { type: Boolean, default: true },
   name: { type: String, default: '' },
   factionSlug: { type: String, default: '' },
@@ -262,6 +277,8 @@ defineEmits([
 
 const { locale } = useLocale()
 const labels = computed(() => ui[locale.value])
+const { showPointsLeft } = useRosterPrefs()
+const leftLabel = computed(() => pointsLeftLabel(props.points, props.limit, labels.value))
 
 const factionPickerOpen = ref(false)
 const detachmentPickerOpen = ref(false)
@@ -358,7 +375,7 @@ const moreOpen = ref(false)
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
 }
-.rw-points.over { color: #d9534f; }
+.rw-points.over { color: var(--danger); }
 
 .rw-more {
   background: none;
@@ -385,5 +402,5 @@ const moreOpen = ref(false)
 .rw-help { margin: 0; padding: 1rem; font-size: 0.9rem; color: var(--text-muted); }
 
 .dp-count { font-style: normal; color: var(--text-dim); }
-.dp-count.over { color: #d9534f; }
+.dp-count.over { color: var(--danger); }
 </style>
