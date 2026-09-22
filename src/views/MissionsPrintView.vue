@@ -76,6 +76,25 @@
       >
     </div>
 
+    <div class="pdf-actions">
+      <button
+        type="button"
+        class="btn-ghost"
+        :disabled="pdfPacking || list.length === 0"
+        @click="downloadPdf('full')"
+      >
+        {{ labels.missionCardsPdf }}
+      </button>
+      <button
+        type="button"
+        class="btn-ghost"
+        :disabled="pdfPacking || list.length === 0"
+        @click="downloadPdf('sheet')"
+      >
+        {{ labels.missionCardsPdfSheet }}
+      </button>
+    </div>
+
     <div class="count">
       {{ labels.missionCardsFound.replace('{n}', list.length) }}
     </div>
@@ -84,9 +103,17 @@
       <MissionCardTile
         v-for="m in list"
         :key="cardKey(m)"
+        :ref="(el) => bindTile(el, cardKey(m))"
         :mission="m"
       />
     </div>
+
+    <MissionCardsPdfModal
+      v-if="pdfOpen"
+      :percent="pdfPercent"
+      :error="pdfError"
+      @close="cancelPdf"
+    />
 
     <p
       v-if="list.length === 0"
@@ -102,10 +129,12 @@
 // mission text comes from src/data/missions.js (getMissions + dedupeSecondaries); the deck
 // art and card labels from src/data/missionCards.js. The detail page of the source project
 // is deliberately not ported: the gallery is the whole feature.
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import MissionCardTile from '../components/missions/MissionCardTile.vue'
+import MissionCardsPdfModal from '../components/missions/MissionCardsPdfModal.vue'
 import { getMissions, dedupeSecondaries } from '../data/missions.js'
 import { expandSecondaries, dispositionLabel } from '../data/missionCards.js'
+import { useMissionCardsPdf } from '../composables/useMissionCardsPdf.js'
 import { ui } from '../i18n/ui.js'
 import { useLocale } from '../composables/useLocale.js'
 
@@ -126,6 +155,21 @@ const deck = ref('all')
 const role = ref('all')
 const sideDeck = ref('tactical')
 const query = ref('')
+
+const {
+  open: pdfOpen,
+  percent: pdfPercent,
+  packing: pdfPacking,
+  error: pdfError,
+  cancel: cancelPdf,
+  exportPdf,
+} = useMissionCardsPdf()
+const tileByKey = new Map()
+
+function bindTile(el, key) {
+  if (el) tileByKey.set(key, el)
+  else tileByKey.delete(key)
+}
 
 const data = computed(() => getMissions(locale.value))
 
@@ -159,6 +203,15 @@ function cardKey(m) {
   const r = (m.roles && m.roles[0]) || m.role
   return type.value === 'secondary' ? `${m.slug}|${r}|${m.sideDeck}` : m.slug
 }
+
+function downloadPdf(mode) {
+  if (pdfPacking.value || list.value.length === 0) return
+  const tiles = list.value.map((m) => tileByKey.get(cardKey(m))).filter(Boolean)
+  const filename = mode === 'sheet' ? 'mission-cards-sheet.pdf' : 'mission-cards.pdf'
+  exportPdf(tiles, mode, filename)
+}
+
+onBeforeUnmount(cancelPdf)
 </script>
 
 <style scoped>
@@ -206,6 +259,20 @@ function cardKey(m) {
 .select:focus,
 .search:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .search { flex: 1; }
+
+.pdf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.pdf-actions .btn-ghost {
+  min-height: 44px;
+  justify-content: center;
+}
+@media (max-width: 560px) {
+  .pdf-actions .btn-ghost { flex: 1 1 100%; }
+}
 
 .count { color: var(--text-dim); font-size: 13px; margin-bottom: 14px; }
 

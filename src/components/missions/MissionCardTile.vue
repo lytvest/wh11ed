@@ -30,10 +30,11 @@
 <script setup>
 // A mission card pair (front + back) with a PNG download per face. The card faces are rendered
 // by MissionCardFace and their refs are read here — the export needs the live DOM node, so the
-// download button and the card must share a component boundary.
+// download button and the card must share a component boundary. The bulk PDF path reuses the
+// same capture through `captureFaces`.
 import { computed, reactive } from 'vue'
-import { domToPng } from 'modern-screenshot'
 import MissionCardFace from './MissionCardFace.vue'
+import { rasterizeCardPng, rasterizeCardJpeg, waitForExportLayout } from '../../composables/missionCardRaster.js'
 import { ui } from '../../i18n/ui.js'
 import { useLocale } from '../../composables/useLocale.js'
 
@@ -47,12 +48,6 @@ const labels = computed(() => ui[locale.value])
 const faceRefs = reactive({ front: null, back: null })
 const busy = reactive({ front: false, back: false })
 
-// 1024px wide is the source project's export size — enough for a crisp printed card.
-const PNG_WIDTH = 1024
-
-// Must match `.card`'s border-radius in MissionCardFace.vue (also listed in check-radii.mjs).
-const CARD_RADIUS = 8
-
 function slugify(value) {
   return value
     .toLowerCase()
@@ -60,69 +55,17 @@ function slugify(value) {
     .replace(/^-+|-+$/g, '')
 }
 
-function nextFrame() {
-  return new Promise((resolve) => requestAnimationFrame(resolve))
-}
-
-async function waitForExportLayout() {
-  if (document.fonts?.ready) await document.fonts.ready
-  await nextFrame()
-  await nextFrame()
-}
-
-// modern-screenshot rasterizes the node into an SVG <foreignObject> and does NOT clip the root
-// element's border-radius, so an exported card would come out with square corners (and, with a
-// background color set, a white line along the edge left by the fractional box). The PNG is
-// therefore re-clipped here: draw the raw export onto a canvas through a rounded-rect path, which
-// is what the on-screen card actually looks like. Canvas roundRect() is Safari 16.4+, above the
-// app's 16.2 floor, so the path is built with arcTo instead.
-function clipToRoundedCard(dataUrl, width, height, radius) {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      canvas.width = img.width
-      canvas.height = img.height
-      const ctx = canvas.getContext('2d')
-      // Scale the CSS-pixel radius up to the exported pixel size.
-      const r = radius * (img.width / width)
-      ctx.beginPath()
-      ctx.moveTo(r, 0)
-      ctx.arcTo(img.width, 0, img.width, img.height, r)
-      ctx.arcTo(img.width, img.height, 0, img.height, r)
-      ctx.arcTo(0, img.height, 0, 0, r)
-      ctx.arcTo(0, 0, img.width, 0, r)
-      ctx.closePath()
-      ctx.clip()
-      ctx.drawImage(img, 0, 0)
-      resolve(canvas.toDataURL('image/png'))
-    }
-    img.onerror = reject
-    img.src = dataUrl
-  })
+function faceNode(side) {
+  return faceRefs[side]?.cardRef
 }
 
 async function download(side) {
-  const node = faceRefs[side]?.cardRef
+  const node = faceNode(side)
   if (!node || busy[side]) return
   busy[side] = true
   try {
     await waitForExportLayout()
-    // Round to whole pixels so the clone and the canvas agree — a fractional box leaves a
-    // sub-pixel sliver where the background bleeds through as a white edge line.
-    const rect = node.getBoundingClientRect()
-    const width = Math.round(rect.width)
-    const height = Math.round(rect.height)
-    const square = await domToPng(node, {
-      width,
-      height,
-      scale: PNG_WIDTH / width,
-      style: {
-        width: `${width}px`,
-        height: `${height}px`,
-      },
-    })
-    const dataUrl = await clipToRoundedCard(square, width, height, CARD_RADIUS)
+    const dataUrl = await rasterizeCardPng(node)
     const role = props.mission.role || (props.mission.roles && props.mission.roles[0])
     const rolePart = role ? `-${role}` : ''
     const deck = props.mission.sideDeck ? `-${props.mission.sideDeck}` : ''
@@ -134,6 +77,20 @@ async function download(side) {
     busy[side] = false
   }
 }
+
+// JPEG bytes of both faces, for the bulk PDF. Same capture path as the PNG button.
+async function captureFaces() {
+  const front = faceNode('front')
+  const back = faceNode('back')
+  if (!front || !back) throw new Error('card faces are not mounted')
+  await waitForExportLayout()
+  return {
+    front: await rasterizeCardJpeg(front),
+    back: await rasterizeCardJpeg(back),
+  }
+}
+
+defineExpose({ captureFaces })
 </script>
 
 <style scoped>

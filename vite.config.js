@@ -17,6 +17,35 @@ const SITE_ORIGIN = process.env.VITE_SITE_ORIGIN || 'https://wh-rules.ru'
 // emitted asset URLs. Default is the project's own root deployment.
 const BASE = process.env.VITE_BASE || '/'
 
+// The same base as a PATH with a trailing slash (`/` or `/waha/`). BASE can be an absolute URL
+// (`my_deploy.sh` passes `https://sveta-disk.ru/waha/`), but Workbox matches `url.pathname`, and
+// its `navigateFallback` is resolved against the service worker's own location — both want a path.
+//
+// This is not cosmetic on a subpath build. `navigateFallback: '/index.html'` becomes
+// `createHandlerBoundToURL('/index.html')`, which resolves to `https://host/index.html` while the
+// precache key is `https://host/waha/index.html`; Workbox throws `non-precached-url`, the worker
+// never installs, and a stale `index.html` is never replaced. And a `startsWith('/assets/')` route
+// never matches `/waha/assets/…`, so neither lazy route chunks nor the offline warm-up ever land
+// in the runtime cache. The root deployment is unaffected (BASE_PATH is `/`).
+const BASE_PATH = (() => {
+  try {
+    const p = new URL(BASE, 'http://vite.local').pathname
+    return p.endsWith('/') ? p : p + '/'
+  } catch {
+    return '/'
+  }
+})()
+
+// The two `runtimeCaching` patterns below are serialised INTO dist/sw.js by workbox-build, which
+// interpolates each `urlPattern` function's source verbatim — a closure over a config-file
+// variable like BASE_PATH would emit a name that does not exist in the worker (`BASE_PATH is not
+// defined`, and the whole registration throws). So the base is spelled out as a literal here and
+// the path is rebuilt inside the worker from `self.location`, which is exactly the deployment
+// subpath. Anchor the comparison at the start so `/waha/` cannot match a sibling `/waha-extra/`.
+const routePatternSource = (segment) =>
+  `({ url }) => { const b = self.location.pathname.replace(/[^/]*$/, ''); ` +
+  `return url.pathname === b.slice(0, -1) + '/${segment}' || url.pathname.startsWith(b + '${segment}/') }`
+
 // Replace the %SITE_ORIGIN% placeholder in index.html at build time. Not Vite's built-in
 // %VITE_*% mechanism, so we control the fallback (a bare `npm run build` with no env still emits
 // a valid absolute origin instead of an empty string).
@@ -243,7 +272,7 @@ export default defineConfig({
         ],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         cleanupOutdatedCaches: true,
-        navigateFallback: '/index.html',
+        navigateFallback: `${BASE_PATH}index.html`,
         // Images (stable, non-hashed names) — CacheFirst. A tab caches them on demand as the
         // user views them; the installed app's warm-up fetches all of them up front. Because
         // names are stable, a changed image must be renamed (same rule as before) or the old
@@ -254,7 +283,7 @@ export default defineConfig({
         // one re-downloads from scratch). The cache name is data, not branding.
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.pathname.startsWith('/images/'),
+            urlPattern: eval('(' + routePatternSource('images') + ')'),
             handler: 'CacheFirst',
             options: {
               cacheName: 'wh11ed-images',
@@ -268,7 +297,7 @@ export default defineConfig({
           // out of date. `maxEntries` is what bounds the growth instead: each deploy renames the
           // chunks it changed, and the LRU drops the versions nobody asks for any more.
           {
-            urlPattern: ({ url }) => url.pathname.startsWith('/assets/'),
+            urlPattern: eval('(' + routePatternSource('assets') + ')'),
             handler: 'CacheFirst',
             options: {
               cacheName: 'wh-rules-assets',
