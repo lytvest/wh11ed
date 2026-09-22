@@ -137,7 +137,7 @@ async function copy(value, which) {
   border: 1px solid var(--border);
   cursor: pointer;
 }
-.rex-fmt.on { color: #fff; background: var(--accent); border-color: var(--accent); }
+.rex-fmt.on { color: #fff; background: var(--accent); border-color: var(--accent-text); }
 .rex-hint { margin: 0; font-size: 0.75rem; color: var(--text-muted); }
 .rex-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .rex-btn {

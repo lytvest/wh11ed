@@ -291,10 +291,16 @@ const base = server.resolvedUrls.local[0].replace(/\/$/, '')
 let browser
 try {
   browser = await chromium.launch({ channel: 'chrome' })
-} catch (e) {
-  console.error('✗ a11y: could not launch Google Chrome via playwright-core —', e.message.split('\n')[0])
-  await server.close()
-  process.exit(1)
+} catch {
+  // No system Google Chrome (a dev box, a container) — fall back to the Chromium
+  // playwright-core ships with. CI has the real Chrome, so the primary path stays.
+  try {
+    browser = await chromium.launch()
+  } catch (e) {
+    console.error('✗ a11y: could not launch a Chromium browser via playwright-core —', e.message.split('\n')[0])
+    await server.close()
+    process.exit(1)
+  }
 }
 
 const findings = []

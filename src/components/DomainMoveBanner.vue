@@ -101,7 +101,7 @@ function dismiss() {
 .db-icon {
   float: left;
   margin: 0.15rem 0.6rem 0.2rem 0;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 1rem;
 }
 
@@ -130,7 +130,7 @@ function dismiss() {
 }
 
 .db-link {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
 }
 

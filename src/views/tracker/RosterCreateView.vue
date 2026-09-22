@@ -752,8 +752,8 @@ watchEffect(() => {
 }
 .rc-step:disabled { cursor: default; opacity: 0.55; }
 .rc-step:not(:disabled):hover { color: var(--text-primary); }
-.rc-step.on:not(:disabled):hover { color: var(--accent); }
-.rc-step.on { color: var(--accent); }
+.rc-step.on:not(:disabled):hover { color: var(--accent-text); }
+.rc-step.on { color: var(--accent-text); }
 .rc-step.done { color: var(--text-muted); }
 .rc-step-sep { color: var(--text-dim); font-size: 0.75rem; }
 /* Small phones: three steps + arrows is a lot to fit on one line. Shrink first; on the
@@ -794,7 +794,7 @@ watchEffect(() => {
   color: var(--text-primary);
   font-size: 0.9rem;
 }
-.field input:focus { outline: none; border-color: var(--accent); }
+.field input:focus { outline: none; border-color: var(--accent-text); }
 
 .btn-choose {
   display: flex;
@@ -812,7 +812,7 @@ watchEffect(() => {
   font-weight: 600;
   transition: border-color 0.15s;
 }
-.btn-choose:hover { border-color: var(--accent); }
+.btn-choose:hover { border-color: var(--accent-text); }
 .btn-choose:disabled { opacity: 0.5; cursor: not-allowed; }
 .ct-name.placeholder { color: var(--text-muted); font-weight: 500; }
 .ct-chev { color: var(--text-dim); }
@@ -820,7 +820,7 @@ watchEffect(() => {
 .dp-count {
   font-style: normal;
   font-family: var(--font-mono);
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
   margin-left: 0.3rem;
 }

@@ -187,11 +187,11 @@ const modalImageSrc = computed(() => (modalMeasurements.value ? props.layout.ima
 }
 .measurements-toggle:hover {
   color: var(--text-primary);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 .measurements-toggle[aria-pressed="true"] {
-  color: var(--accent);
-  border-color: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent-text);
 }
 @media (max-width: 420px) {
   .mh-title { font-size: 1.2rem; }

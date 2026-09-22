@@ -1379,17 +1379,17 @@ function cancel() {
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
-@media (hover: hover) { .step:not(:disabled):not(.on):hover { border-color: var(--accent); color: var(--accent); } }
+@media (hover: hover) { .step:not(:disabled):not(.on):hover { border-color: var(--accent-text); color: var(--accent-text); } }
 .step:disabled { cursor: default; opacity: 0.55; }
 .step.on {
   color: #fff;
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   cursor: default;
 }
 .step.done {
-  color: var(--accent);
-  border-color: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent-text);
 }
 .step-sep { color: var(--text-dim); }
 .steps-compact {
@@ -1398,7 +1398,7 @@ function cancel() {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 @media (max-width: 560px) {
   .steps { display: none; }
@@ -1499,7 +1499,7 @@ function cancel() {
   font-family: var(--font-display);
   font-size: 1.21rem;
   font-weight: 500;
-  color: var(--accent);
+  color: var(--accent-text);
   margin: 0 0 0.3rem;
 }
 .deploy-card .layout-note { margin: 0.4rem 0 0; }
@@ -1519,7 +1519,7 @@ function cancel() {
   font-family: var(--font-display);
   font-size: 1.21rem;
   font-weight: 500;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-bottom: 0.75rem;
 }
 /* The team name beside "You"/"Opponent" in a step-2 heading — muted so the fixed side label
@@ -1564,7 +1564,7 @@ function cancel() {
 .dp-count {
   font-style: normal;
   font-family: var(--font-mono);
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
   margin-left: 0.3rem;
 }
@@ -1634,7 +1634,7 @@ function cancel() {
   font-weight: 600;
   transition: border-color 0.15s;
 }
-.btn-choose-twist:hover { border-color: var(--accent); }
+.btn-choose-twist:hover { border-color: var(--accent-text); }
 .ct-name.placeholder { color: var(--text-muted); font-weight: 500; }
 .ct-chev { color: var(--text-dim); }
 .twist-chosen {
@@ -1669,8 +1669,8 @@ function cancel() {
   background: var(--bg-secondary); color: var(--text-muted);
   font-size: 1rem; cursor: pointer;
 }
-.rp-open:hover { border-color: var(--accent); color: var(--text-primary); }
-.rp-open.on { border-color: var(--accent); color: var(--accent); }
+.rp-open:hover { border-color: var(--accent-text); color: var(--text-primary); }
+.rp-open.on { border-color: var(--accent-text); color: var(--accent-text); }
 /* Stands where the faction picker would be, so it keeps `.ro`'s shape and only adds the ✕. */
 .roster-line { display: flex; align-items: center; gap: 0.5rem; }
 .rl-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1688,7 +1688,7 @@ function cancel() {
   font-size: 0.74rem;
   cursor: pointer;
 }
-.chip.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.chip.on { background: var(--accent); color: #fff; border-color: var(--accent-text); }
 .chip:disabled { opacity: 0.4; cursor: not-allowed; }
 .ro {
   padding: 0.5rem 0.6rem;

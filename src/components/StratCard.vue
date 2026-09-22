@@ -413,12 +413,12 @@ const renderField = text => (text ? renderRichText(text) : '')
 @media (prefers-color-scheme: dark) {
   .strat-card.turn-either { --turn-text: #5cbf83; }
   .strat-card.turn-your { --turn-text: #6aa9d6; }
-  .strat-card.turn-opponent { --turn-text: #ef6e60; }
+  .strat-card.turn-opponent { --turn-text: var(--danger); }
 }
 :root[data-theme='light'] .strat-card.turn-either { --turn-text: var(--turn-color); }
 :root[data-theme='light'] .strat-card.turn-your { --turn-text: var(--turn-color); }
 :root[data-theme='light'] .strat-card.turn-opponent { --turn-text: var(--turn-color); }
 :root[data-theme='dark'] .strat-card.turn-either { --turn-text: #5cbf83; }
 :root[data-theme='dark'] .strat-card.turn-your { --turn-text: #6aa9d6; }
-:root[data-theme='dark'] .strat-card.turn-opponent { --turn-text: #ef6e60; }
+:root[data-theme='dark'] .strat-card.turn-opponent { --turn-text: var(--danger); }
 </style>

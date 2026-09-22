@@ -162,7 +162,7 @@ const showDetails = ref(false)
 }
 
 .footer-contact a {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -186,7 +186,7 @@ const showDetails = ref(false)
   /* 24px tap target (WCAG 2.5.8, `npm run a11y`): the row of ways in is what a phone reader
      taps, and at text height it was 22px. Two pixels a row, nothing moves. */
   min-height: 24px;
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 }
 @media (hover: hover) {
@@ -235,7 +235,7 @@ const showDetails = ref(false)
 }
 
 .footer-version a:hover {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* One line with the app version — two stacked mono lines was the tallest thing in the column. */

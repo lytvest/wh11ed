@@ -137,8 +137,8 @@ function toneOf(d) {
   transition: background 0.15s, border-color 0.15s;
   width: 100%;
 }
-.det:hover { border-color: var(--accent); }
-.det.on { background: color-mix(in srgb, var(--accent) 16%, transparent); border-color: var(--accent); }
+.det:hover { border-color: var(--accent-text); }
+.det.on { background: color-mix(in srgb, var(--accent) 16%, transparent); border-color: var(--accent-text); }
 
 /* The row above the list: what to press to start over, and what the list is not showing. */
 .det-tools { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
@@ -158,5 +158,5 @@ function toneOf(d) {
   color: var(--text-primary);
   white-space: nowrap;
 }
-.det.on .det-dp { border-color: var(--accent); color: var(--accent); }
+.det.on .det-dp { border-color: var(--accent-text); color: var(--accent-text); }
 </style>

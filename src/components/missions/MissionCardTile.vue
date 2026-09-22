@@ -129,7 +129,7 @@ defineExpose({ captureFaces })
   cursor: pointer;
   transition: background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast);
 }
-.download-btn:hover { background: var(--bg-row-hover); border-color: var(--accent); color: var(--accent); }
+.download-btn:hover { background: var(--bg-row-hover); border-color: var(--accent-text); color: var(--accent-text); }
 .download-btn:disabled { opacity: 0.6; cursor: default; }
 
 @media (max-width: 820px) {

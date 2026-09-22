@@ -1472,7 +1472,7 @@ function stratKey(strat) {
   text-decoration: none;
   font-size: 0.8rem;
 }
-.rv-record:hover { border-color: var(--accent); color: var(--text-primary); }
+.rv-record:hover { border-color: var(--accent-text); color: var(--text-primary); }
 .rvr-rec { color: var(--text-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
 .rvr-lab { flex: 1; }
 
@@ -1491,7 +1491,7 @@ function stratKey(strat) {
   font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
   transition: border-color var(--motion-fast), color var(--motion-fast);
 }
-.rvp-head:hover { border-color: var(--accent); color: var(--accent); }
+.rvp-head:hover { border-color: var(--accent-text); color: var(--accent-text); }
 .rvp-chev { flex-shrink: 0; font-size: 0.7rem; }
 .rvp-title { flex: 1; text-align: left; }
 .rvp-count { flex-shrink: 0; font-family: var(--font-mono); }
@@ -1564,7 +1564,7 @@ function stratKey(strat) {
   text-decoration: none;
   cursor: pointer;
 }
-.hdr-icon:hover { border-color: var(--accent); color: var(--accent); }
+.hdr-icon:hover { border-color: var(--accent-text); color: var(--accent-text); }
 /* A phone spends the width on the name: the meta is what stands between it and the corner. */
 @media (max-width: 480px) {
   .rv-head { gap: 0.5rem; }
@@ -1596,7 +1596,7 @@ function stratKey(strat) {
   letter-spacing: 0.04em;
   cursor: pointer;
 }
-.rvn-head:hover { color: var(--accent); }
+.rvn-head:hover { color: var(--accent-text); }
 .rvn-chev { font-size: 0.75rem; }
 .rvn-text {
   margin: 0 0 0.3rem;
@@ -1678,7 +1678,7 @@ function stratKey(strat) {
   border: 1px solid var(--border);
   margin-bottom: 0.5rem;
 }
-.rvunit:hover { border-color: var(--accent); }
+.rvunit:hover { border-color: var(--accent-text); }
 .rvunit-main {
   display: flex;
   width: 100%;
@@ -1710,7 +1710,7 @@ function stratKey(strat) {
   font-size: 0.7rem; line-height: 1;
   transition: border-color var(--motion-fast), color var(--motion-fast);
 }
-.rvunit-more:hover { border-color: var(--accent); color: var(--accent); }
+.rvunit-more:hover { border-color: var(--accent-text); color: var(--accent-text); }
 .rvunit-more-n { font-family: var(--font-mono); font-weight: 700; }
 /* The folded-out strip continues the one above it, so it carries no rule of its own. */
 .rvunit-rest { border-top: 0; padding-top: 0; }
@@ -1718,7 +1718,7 @@ function stratKey(strat) {
 .rvunit-name { font-weight: 600; color: var(--text-primary); font-size: 0.92rem; }
 /* Closes the gap to the character indented below it — the block's own look is the shared
    .roster-attached / .roster-sum pair in style.css. */
-.rvunit-role { margin-left: 0.35rem; font-weight: 400; font-size: 0.74rem; color: var(--accent); }
+.rvunit-role { margin-left: 0.35rem; font-weight: 400; font-size: 0.74rem; color: var(--accent-text); }
 .rvunit:has(+ .rvunit-attached) { margin-bottom: 0; }
 /* The card is width:100% here; the rail's indent has to come off that. */
 .rvunit-attached { width: auto; }
@@ -1729,7 +1729,7 @@ function stratKey(strat) {
 .rvst { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
 /* A plate the modifier layer rewrote — the same accent treatment DatasheetCard gives a modified
    value, so the list and the card agree at a glance as well as in the number. */
-.rvst-mod .rvst-box { color: var(--accent); }
+.rvst-mod .rvst-box { color: var(--accent-text); }
 .rvst-label { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.5px; color: var(--text-muted); }
 .rvst-box {
   position: relative;
@@ -1757,7 +1757,7 @@ function stratKey(strat) {
 /* Invulnerable save — its own plate right after SV, colour-called-out the way DatasheetCard's
    accent-coloured "Invulnerable Save" label calls it out (a distinct accent fill, not just
    another neutral box, so it reads as "special" among the plain stats). */
-.rvst-inv .rvst-label { color: var(--accent); }
+.rvst-inv .rvst-label { color: var(--accent-text); }
 .rvst-inv .rvst-box { background: var(--accent); color: var(--text-on-accent, #fff); }
 .rvst-inv .rvst-box::before { background: var(--accent); }
 .rvunit-sub { font-size: 0.74rem; color: var(--text-dim); }
@@ -1817,8 +1817,8 @@ function stratKey(strat) {
   cursor: pointer;
   transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
 }
-.strat-toggle:hover { color: var(--text-primary); border-color: var(--accent); }
-.strat-toggle.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.strat-toggle:hover { color: var(--text-primary); border-color: var(--accent-text); }
+.strat-toggle.active { background: var(--accent); border-color: var(--accent-text); color: #fff; }
 
 .phase-group { margin-bottom: 0.75rem; }
 .phase-head {
@@ -1838,7 +1838,7 @@ function stratKey(strat) {
   letter-spacing: 0.3px;
   transition: border-color var(--motion-fast);
 }
-.phase-head:hover { border-color: var(--accent); }
+.phase-head:hover { border-color: var(--accent-text); }
 .phase-chev { flex-shrink: 0; font-size: 0.8rem; color: var(--text-dim); }
 .phase-name { flex: 1; text-align: left; }
 .phase-count { flex-shrink: 0; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }

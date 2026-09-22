@@ -262,7 +262,7 @@ function onRestore(slug) { restoreSecondaryToHand(props.pi, slug) }
   padding: 0.35rem 0.8rem; background: transparent; color: var(--text-muted);
   border: 1px solid var(--border); font-size: 0.78rem; font-weight: 600; cursor: pointer;
 }
-.choose-btn:hover { color: var(--text-primary); border-color: var(--accent); }
+.choose-btn:hover { color: var(--text-primary); border-color: var(--accent-text); }
 .cards { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; position: relative; }
 .card { display: flex; align-items: stretch; gap: 0.3rem; }
 /* Hand transitions: draws fade/slide in, removed cards fade out in place (absolute, so
@@ -283,14 +283,14 @@ function onRestore(slug) { restoreSecondaryToHand(props.pi, slug) }
   cursor: pointer;
   text-align: left;
 }
-.card-open:hover { border-color: var(--accent); }
+.card-open:hover { border-color: var(--accent-text); }
 .card-name { font-weight: 700; font-size: 0.88rem; color: var(--text-primary); }
-.card-vp { font-family: var(--font-mono); font-weight: 700; font-size: 0.82rem; color: var(--accent); flex-shrink: 0; }
+.card-vp { font-family: var(--font-mono); font-weight: 700; font-size: 0.82rem; color: var(--accent-text); flex-shrink: 0; }
 .manage {
   background: none; border: 1px solid var(--border); color: var(--text-dim);
   cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 0.55rem; flex-shrink: 0;
 }
-.manage:hover { color: var(--accent); border-color: var(--accent); }
+.manage:hover { color: var(--accent-text); border-color: var(--accent-text); }
 .manage.restore { display: flex; align-items: center; }
 .manage.restore .bi { font-size: 0.95rem; }
 
@@ -325,7 +325,7 @@ function onRestore(slug) { restoreSecondaryToHand(props.pi, slug) }
   padding: 0.6rem 0.7rem; border: 1px solid var(--border);
   background: var(--bg-secondary); cursor: pointer; text-align: left;
 }
-.pick-item:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.pick-item:hover { border-color: var(--accent-text); background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .pick-name { font-weight: 700; font-size: 0.88rem; color: var(--text-primary); }
 .pick-cat { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-dim); flex-shrink: 0; }
 .pick-empty { font-size: 0.85rem; color: var(--text-dim); font-style: italic; margin: 0.3rem 0; text-align: center; }

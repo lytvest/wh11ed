@@ -92,12 +92,12 @@ const labels = computed(() => ui[locale.value])
 }
 
 .fdp-item:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .fdp-item.on {
   background: color-mix(in srgb, var(--accent) 14%, transparent);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 /* Name on the left, price + disposition + keyword stacked in the top-right corner. */
@@ -143,7 +143,7 @@ const labels = computed(() => ui[locale.value])
   font-family: var(--font-mono);
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
   white-space: nowrap;
 }
 

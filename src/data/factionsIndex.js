@@ -14,7 +14,7 @@
 // `color` — Wahapedia-style faction theming, applied by FactionLayout as the page's --accent:
 // `light` is the light-theme value (dark enough for white text on active chips), `dark` the
 // dark-theme value (brighter, readable on the dark background — same idea as the app's own
-// #8b2a33 → #c8585e accent pair).
+// light/dark accent pair in style.css).
 //
 // `abbr` — the two-or-three-letter monogram the pickers print in a coloured badge beside the
 // name (FactionPickerModal): hand-chosen, because initials collide (Adeptus Mechanicus and

@@ -593,7 +593,7 @@ function rename(name) {
 .rname-input.long { font-size: clamp(1.35rem, 5.2vw, 1.7rem); }
 .rname-input.xlong { font-size: clamp(1.15rem, 4.4vw, 1.7rem); }
 .rname-input:hover { border-bottom-color: var(--border); }
-.rname-input:focus { outline: none; border-bottom-color: var(--accent); }
+.rname-input:focus { outline: none; border-bottom-color: var(--accent-text); }
 /* Same square box as the view header's own icons (RosterViewView) — a header icon is a header
    icon whichever screen it is on, and there a link and a button sit side by side. */
 .hdr-icon {
@@ -612,7 +612,7 @@ function rename(name) {
   color: var(--text-muted);
   cursor: pointer;
 }
-.hdr-icon:hover { border-color: var(--accent); color: var(--accent); }
+.hdr-icon:hover { border-color: var(--accent-text); color: var(--accent-text); }
 
 /* The tabs are PageTabs' own; only where they sit is this screen's business. */
 .red-tabs { margin-bottom: 1rem; }
@@ -686,7 +686,7 @@ function rename(name) {
   color: var(--text-muted);
   cursor: pointer;
 }
-.bsize-btn.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.bsize-btn.on { background: var(--accent); color: #fff; border-color: var(--accent-text); }
 .bsize-input {
   width: 5rem;
   padding: 0.2rem 0.4rem;
@@ -714,7 +714,7 @@ function rename(name) {
   line-height: 1.4;
   resize: vertical;
 }
-.notes-input:focus { outline: none; border-color: var(--accent); }
+.notes-input:focus { outline: none; border-color: var(--accent-text); }
 
 .red-hint, .red-empty { color: var(--text-muted); font-style: italic; text-align: center; padding: 1.5rem 0; }
 

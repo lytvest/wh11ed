@@ -139,12 +139,12 @@ const activeChapter = computed(() => {
 }
 
 .event-toc-chapter:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 }
 
 .event-toc-group.current .event-toc-chapter {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .event-toc-list {
@@ -164,7 +164,7 @@ const activeChapter = computed(() => {
 }
 
 .event-toc-link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 }
 

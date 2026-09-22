@@ -51,7 +51,7 @@ const t = computed(() => rulesLanding[locale.value])
 }
 
 .rule-link:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   text-decoration: none;
 }
 

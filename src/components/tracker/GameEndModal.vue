@@ -70,7 +70,7 @@ function toggle(id) { reason.value = reason.value === id ? null : id }
 .ge-row:last-of-type { border-bottom: none; }
 .ge-text { font-size: 0.95rem; color: var(--text-primary); }
 .ge-row.on .ge-text { font-weight: 700; }
-.ge-check { width: 22px; height: 22px; flex-shrink: 0; accent-color: var(--accent); cursor: pointer; }
+.ge-check { width: 22px; height: 22px; flex-shrink: 0; accent-color: var(--accent-text); cursor: pointer; }
 
 .ge-note {
   margin: 0.6rem 0 0;

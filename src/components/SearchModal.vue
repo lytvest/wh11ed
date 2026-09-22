@@ -411,7 +411,7 @@ function navigate(item) {
 .result-num {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -520,7 +520,7 @@ function navigate(item) {
 
 :deep(mark) {
   background: color-mix(in srgb, var(--accent) 18%, transparent);
-  color: var(--accent);
+  color: var(--accent-text);
   border-radius: 2px;
   padding: 0 1px;
 }

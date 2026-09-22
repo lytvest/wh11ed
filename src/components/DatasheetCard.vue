@@ -1422,7 +1422,7 @@ function abilityStateLabel(st) {
   min-width: 0;
 }
 .ds-inv-band {
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.66rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -1487,7 +1487,7 @@ function abilityStateLabel(st) {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent);
+  color: var(--accent-text);
   margin: 0 0 0.25rem;
 }
 .ds-points table { border-collapse: collapse; font-size: 0.8rem; margin: 0; }
@@ -1752,7 +1752,7 @@ function abilityStateLabel(st) {
     min-width: 0;
     padding: 0 0.1rem 0.3rem;
     background: none;
-    color: var(--accent);
+    color: var(--accent-text);
     font-size: 0.64rem;
   }
 
@@ -1845,7 +1845,7 @@ function abilityStateLabel(st) {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent);
+  color: var(--accent-text);
   margin: 0 0 0.2rem;
 }
 /* The "possible modifiers" heading is also the accordion's handle, and unlike every other block on
@@ -1866,7 +1866,7 @@ function abilityStateLabel(st) {
   margin: 0 0 0.4rem;
   transition: border-color var(--motion-fast), color var(--motion-fast);
 }
-.ds-mods-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ds-mods-btn:hover { border-color: var(--accent-text); color: var(--accent-text); }
 /* Open, the list below closes the section with its own rule and margin; shut, the pill is the
    section, and it needs that room itself or the abilities crowd it again. */
 .ds-mods-btn[aria-expanded="false"] { margin-bottom: 0.9rem; }
@@ -1885,9 +1885,9 @@ function abilityStateLabel(st) {
   padding: 0; border: 0; background: none; font: inherit; color: var(--text-primary);
   cursor: pointer; text-align: left;
 }
-.ds-mod-srcbtn:hover { color: var(--accent); }
+.ds-mod-srcbtn:hover { color: var(--accent-text); }
 .ds-mod-srcbtn .bi { font-size: 0.85em; color: var(--text-muted); }
-.ds-mod-srcbtn:hover .bi { color: var(--accent); }
+.ds-mod-srcbtn:hover .bi { color: var(--accent-text); }
 .ds-mod-det { color: var(--text-muted); }
 /* A conditional modifier didn't change anything on the card — the dimmed delta says so at a
    glance, and the condition follows. */
@@ -1895,8 +1895,8 @@ function abilityStateLabel(st) {
 .ds-mod-cond { flex-basis: 100%; padding-left: 0.1rem; font-style: italic; }
 /* Applied because the game says so, not because it is printed — the accent marks the difference
    at a glance, the italic condition beside it says what would take it away again. */
-.ds-mod-live .ds-mod-cond { color: var(--accent); font-style: normal; }
-.ds-mod-live .ds-mod-delta { color: var(--accent); }
+.ds-mod-live .ds-mod-cond { color: var(--accent-text); font-style: normal; }
+.ds-mod-live .ds-mod-delta { color: var(--accent-text); }
 /* The `*` on a value the layer rewrote, and its cell. Same asterisk convention as the granted
    keywords' `.ds-kw-star`.
    `line-height: 0` + `position: relative` instead of the default `vertical-align: super`: a real
@@ -1914,7 +1914,7 @@ function abilityStateLabel(st) {
   vertical-align: baseline;
   line-height: 0;
   font-size: 0.7em;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
   margin-left: 1px;
 }
@@ -1923,7 +1923,7 @@ function abilityStateLabel(st) {
    default colour and only the asterisk shows. */
 .ds-weapons td.ds-stat-mod,
 .ds-weapons tbody td.ds-stat-mod,
-span.ds-stat-box.ds-stat-mod { color: var(--accent); }
+span.ds-stat-box.ds-stat-mod { color: var(--accent-text); }
 
 /* Abilities */
 .ds-abilities { font-size: 0.85rem; line-height: 1.5; color: var(--text-primary); }
@@ -1944,7 +1944,7 @@ span.ds-stat-box.ds-stat-mod { color: var(--accent); }
   display: inline-flex; align-items: baseline; gap: 0.2rem; margin-right: 0.3rem;
   color: var(--text-muted); font-size: 0.78em; font-style: italic;
 }
-.ds-ab-state.on { color: var(--accent); font-style: normal; }
+.ds-ab-state.on { color: var(--accent-text); font-style: normal; }
 .ds-ab-state .bi { font-size: 0.9em; font-style: normal; }
 .ds-ability-idle { opacity: 0.62; }
 .ds-ab-conds { margin-top: 0.35rem; }
@@ -1958,7 +1958,7 @@ span.ds-stat-box.ds-stat-mod { color: var(--accent); }
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent);
+  color: var(--accent-text);
   margin: var(--ds-head-top) 0 var(--ds-head-bottom);
 }
 /* Accordion header variant (collapsible/modal mode only) — same `.ds-group-title` look, reset to
@@ -2069,7 +2069,7 @@ span.ds-stat-box.ds-stat-mod { color: var(--accent); }
 }
 
 .ds-kw-star {
-  color: var(--accent);
+  color: var(--accent-text);
   margin-left: 1px;
 }
 

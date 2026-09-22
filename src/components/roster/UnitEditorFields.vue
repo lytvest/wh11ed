@@ -788,7 +788,7 @@ const writeNote = (obj, key, value) => setNote(obj, key, value)
   font-family: inherit;
   font-size: 0.85rem;
 }
-.ues-note input:focus { outline: none; border-color: var(--accent); }
+.ues-note input:focus { outline: none; border-color: var(--accent-text); }
 /* A build pane is ~180px wide: the button and a labelled field cannot share that row, so the note
    drops under it and keeps its caption beside it. */
 @container (max-width: 300px) {
@@ -863,9 +863,9 @@ const writeNote = (obj, key, value) => setNote(obj, key, value)
   color: var(--text-muted);
   cursor: pointer;
 }
-.pill.on { background: color-mix(in srgb, var(--accent) 16%, transparent); border-color: var(--accent); color: var(--text-primary); }
+.pill.on { background: color-mix(in srgb, var(--accent) 16%, transparent); border-color: var(--accent-text); color: var(--text-primary); }
 .opt-name { color: var(--text-primary); }
-.opt-pts { font-family: var(--font-mono); font-weight: 700; color: var(--accent); }
+.opt-pts { font-family: var(--font-mono); font-weight: 700; color: var(--accent-text); }
 .opt-tag { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-dim); margin-left: 0.4rem; }
 .wl-flag { color: #e3b341; margin-right: 0.3rem; }
 
@@ -881,7 +881,7 @@ const writeNote = (obj, key, value) => setNote(obj, key, value)
   border: 1px solid var(--border);
   background: var(--bg-secondary);
 }
-.opt-tile.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.opt-tile.on { border-color: var(--accent-text); background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .opt-tile.disabled { opacity: 0.45; }
 .opt-select {
   flex: 1;
@@ -893,7 +893,7 @@ const writeNote = (obj, key, value) => setNote(obj, key, value)
   cursor: pointer;
   font-size: 0.85rem;
 }
-.opt-select input { width: 20px; height: 20px; margin-top: 1px; flex-shrink: 0; accent-color: var(--accent); cursor: pointer; }
+.opt-select input { width: 20px; height: 20px; margin-top: 1px; flex-shrink: 0; accent-color: var(--accent-text); cursor: pointer; }
 .opt-tile.disabled .opt-select { cursor: not-allowed; }
 .opt-info {
   flex-shrink: 0;
@@ -905,7 +905,7 @@ const writeNote = (obj, key, value) => setNote(obj, key, value)
   border: none;
   border-left: 1px solid var(--border);
   font-size: 1.1rem;
-  color: var(--accent);
+  color: var(--accent-text);
   cursor: pointer;
 }
 .opt-info:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }

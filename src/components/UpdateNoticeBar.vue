@@ -57,7 +57,7 @@ const { entry, visible, markSeen } = useUpdateNotice()
 .ub-icon {
   float: left;
   margin: 0.15rem 0.6rem 0.2rem 0;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 1rem;
 }
 
@@ -101,7 +101,7 @@ const { entry, visible, markSeen } = useUpdateNotice()
 
 .ub-link {
   margin-left: 0.5rem;
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
   white-space: nowrap;
 }

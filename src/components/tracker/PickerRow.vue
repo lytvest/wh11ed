@@ -65,7 +65,7 @@ const labels = computed(() => ui[locale.value])
   overflow: hidden;
   background: var(--bg-secondary);
 }
-.tp-item.on { border-color: var(--accent); }
+.tp-item.on { border-color: var(--accent-text); }
 .tp-row { display: flex; align-items: stretch; gap: 0.4rem; }
 .tp-toggle {
   flex: 1;
@@ -92,7 +92,7 @@ const labels = computed(() => ui[locale.value])
   border: none;
   border-left: 1px solid var(--border);
   background: none;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;

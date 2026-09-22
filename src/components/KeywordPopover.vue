@@ -189,7 +189,7 @@ const positionStyle = computed(() => {
 }
 
 .kw-num:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline dotted;
   text-underline-offset: 2px;
 }

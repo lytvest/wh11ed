@@ -483,13 +483,13 @@ function handleDefClick(e) {
 }
 
 .filter-btn:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: var(--text-primary);
 }
 
 .filter-btn.active {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: var(--text-on-accent);
 }
 
@@ -695,7 +695,7 @@ function handleDefClick(e) {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-bottom: 0.5rem;
 }
 

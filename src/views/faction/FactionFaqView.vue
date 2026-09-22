@@ -218,12 +218,12 @@ const activeView = computed(() => {
 
 .faq-seg:hover {
   color: var(--text-primary);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .faq-seg.active {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: #fff;
 }
 

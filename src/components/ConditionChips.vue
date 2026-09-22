@@ -178,7 +178,7 @@ const groups = computed(() => {
   padding: 0; border: none; background: none;
   color: var(--text-muted); cursor: pointer; font-size: 0.85rem;
 }
-.cond-group-info:hover { color: var(--accent); }
+.cond-group-info:hover { color: var(--accent-text); }
 /* stretch, not center: the "i" takes its height from the chip it is attached to, including the
    taller two-line variant below. */
 .cond-item { display: inline-flex; align-items: stretch; }
@@ -190,7 +190,7 @@ const groups = computed(() => {
   border: 1px solid var(--border);
   background: var(--bg-card); color: var(--text-muted); cursor: pointer; font-size: 0.8rem;
 }
-.cond-info:hover { color: var(--accent); border-color: var(--accent); }
+.cond-info:hover { color: var(--accent-text); border-color: var(--accent-text); }
 /* …and whichever half is lit paints its own frame over that shared line. Without this the two
    grey pixels of the quiet half sit on top and the accent frame stops halfway, open on the side
    where the halves meet. Source order settles the tie, so a hovered "i" wins over a lit chip. */
@@ -202,8 +202,8 @@ const groups = computed(() => {
   padding: 0.3rem 0.65rem; border: 1px solid var(--border);
   background: var(--bg-card); color: var(--text-muted); font-size: 0.78rem; cursor: pointer;
 }
-.cond-chip:hover:not(:disabled) { border-color: var(--accent); color: var(--text-primary); }
-.cond-chip.on { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.cond-chip:hover:not(:disabled) { border-color: var(--accent-text); color: var(--text-primary); }
+.cond-chip.on { border-color: var(--accent-text); color: var(--accent-text); font-weight: 600; }
 /* An inert chip has to LOOK inert: `cursor: default` says nothing on a touch screen, and a chip
    that cannot be tapped but reads exactly like one that can is indistinguishable from a bug. */
 .cond-chip.auto { cursor: default; opacity: 0.55; border-style: dashed; }

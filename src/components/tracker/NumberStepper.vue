@@ -72,7 +72,7 @@ function bump(delta) {
   transition: background 0.15s, border-color 0.15s;
 }
 .step-btn:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 .step-btn:disabled {

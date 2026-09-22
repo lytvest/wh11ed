@@ -855,12 +855,12 @@ useFlashOnChange(counter, counterEl)
 }
 
 .army-opt:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .army-opt.on {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: #fff;
 }
 
@@ -886,7 +886,7 @@ useFlashOnChange(counter, counterEl)
 }
 
 .army-field:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 /* Selected Blessing names as plain wrapping text — wraps instead of a single nowrap line, so two
@@ -910,7 +910,7 @@ useFlashOnChange(counter, counterEl)
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .army-field-chev {
@@ -928,7 +928,7 @@ useFlashOnChange(counter, counterEl)
 .army-active-name {
   display: block;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.8rem;
   margin-bottom: 0.1rem;
 }
@@ -963,7 +963,7 @@ useFlashOnChange(counter, counterEl)
   font-family: inherit;
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .army-bonus-btn:hover {
@@ -1007,7 +1007,7 @@ useFlashOnChange(counter, counterEl)
   flex-shrink: 0;
   font-family: var(--font-mono);
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .army-resurrect-undo {
@@ -1026,7 +1026,7 @@ useFlashOnChange(counter, counterEl)
 }
 
 .army-resurrect-undo:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: var(--text-primary);
 }
 
@@ -1049,7 +1049,7 @@ useFlashOnChange(counter, counterEl)
   font-family: var(--font-mono);
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .army-readout-note {
@@ -1078,7 +1078,7 @@ useFlashOnChange(counter, counterEl)
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--accent);
+  color: var(--accent-text);
   line-height: 1;
   transition: transform 0.1s, color 0.15s;
 }
@@ -1138,7 +1138,7 @@ useFlashOnChange(counter, counterEl)
 }
 
 .army-die-add:hover {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .army-die-add:active {
@@ -1181,7 +1181,7 @@ useFlashOnChange(counter, counterEl)
   font-family: inherit;
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .army-again:hover {
@@ -1205,7 +1205,7 @@ useFlashOnChange(counter, counterEl)
 }
 
 .army-head-reset:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: var(--text-primary);
 }
 
@@ -1228,7 +1228,7 @@ useFlashOnChange(counter, counterEl)
   font-family: inherit;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
   text-align: left;
 }
 

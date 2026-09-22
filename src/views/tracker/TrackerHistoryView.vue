@@ -112,7 +112,7 @@ if (!game.value) router.replace('/tracker')
   padding: 0.4rem 0.75rem; border: 1px solid var(--border);
   background: var(--bg-card); color: var(--text-primary); text-decoration: none; font-size: 0.82rem;
 }
-.hv-roster:hover { border-color: var(--accent); color: var(--accent); }
+.hv-roster:hover { border-color: var(--accent-text); color: var(--accent-text); }
 .hv-roster-who { color: var(--text-muted); }
 .hv-roster-name { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 

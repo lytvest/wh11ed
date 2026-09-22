@@ -368,7 +368,7 @@ const groupedDatasheets = computed(() => {
 
 .ds-search:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 /* The sticky chapter/detachment bar itself lives in FactionPickerBar; here we only
@@ -383,7 +383,7 @@ const groupedDatasheets = computed(() => {
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--accent);
+  color: var(--accent-text);
   margin: 1rem 0 0.4rem;
   padding-bottom: 0.25rem;
   border-bottom: 1px solid var(--border);
@@ -452,13 +452,13 @@ const groupedDatasheets = computed(() => {
    folds `--fa-light`/`--fa-dark` into `--accent`), so a marked shelf reads as part of the army
    rather than as a foreign gold. The pin keeps its quiet outline→filled swap: two marks in one
    corner, only one of them coloured. */
-.ds-own.on { color: var(--accent); }
+.ds-own.on { color: var(--accent-text); }
 
 .ds-chip:hover { text-decoration: none; }
 
 .ds-chip:hover {
   background: color-mix(in srgb, var(--accent) 8%, var(--bg-card));
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .ds-chip-name {
@@ -475,7 +475,7 @@ const groupedDatasheets = computed(() => {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  color: var(--accent);
+  color: var(--accent-text);
   white-space: nowrap;
 }
 
@@ -534,7 +534,7 @@ const groupedDatasheets = computed(() => {
   font-size: 0.85rem;
   cursor: pointer;
 }
-.ds-legends-about:hover { color: var(--accent); }
+.ds-legends-about:hover { color: var(--accent-text); }
 .ds-legends-about i { font-size: 0.7rem; }
 
 /* Muted — a folded aside, not the rules the page is for. The global `strong` is near-white at

@@ -245,7 +245,7 @@ onBeforeUnmount(cancelPdf)
   font: inherit;
   font-weight: 600;
 }
-.tab.is-active { background: var(--bg-row-hover); color: var(--accent); }
+.tab.is-active { background: var(--bg-row-hover); color: var(--accent-text); }
 
 .select,
 .search {

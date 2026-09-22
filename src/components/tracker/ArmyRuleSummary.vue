@@ -224,7 +224,7 @@ watch([game, locale], build, { immediate: true })
   background: var(--bg-card); border: 1px solid var(--border);
   color: var(--text-primary); font-size: 0.85rem; font-weight: 600; cursor: pointer;
 }
-.as-toggle:hover { border-color: var(--accent); }
+.as-toggle:hover { border-color: var(--accent-text); }
 .as-body { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.75rem; }
 .as-player {
   background: var(--bg-card); border: 1px solid var(--border); padding: 0.8rem;
@@ -260,5 +260,5 @@ watch([game, locale], build, { immediate: true })
 }
 .as-items li { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
 .as-item-label { font-size: 0.85rem; color: var(--text-primary); overflow-wrap: anywhere; }
-.as-item-cost { flex-shrink: 0; font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; color: var(--accent); }
+.as-item-cost { flex-shrink: 0; font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; color: var(--accent-text); }
 </style>

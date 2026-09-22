@@ -189,7 +189,8 @@ function backToUnits() {
    --link-accent must be re-declared locally: on :root it is declared as var(--accent)
    and inherits already computed (the app-wide red), so it would not follow --accent. */
 .faction-view.themed {
-  --accent: var(--fa-light);
+    --accent: var(--fa-light);
+    --accent-text: var(--fa-light);
   --accent-hover: color-mix(in srgb, var(--fa-light) 80%, black);
   --link-accent: var(--accent);
   --link-accent-hover: var(--accent-hover);
@@ -202,7 +203,8 @@ function backToUnits() {
    bare :root rules that poisoned --accent app-wide once this lazy CSS chunk loaded. */
 @media (prefers-color-scheme: dark) {
   .faction-view.themed {
-    --accent: var(--fa-dark);
+      --accent: var(--fa-dark);
+      --accent-text: var(--fa-dark);
     --accent-hover: color-mix(in srgb, var(--fa-dark) 80%, white);
     --link-accent: #e8c96a;
     --link-accent-hover: #f0d98a;
@@ -229,7 +231,7 @@ function backToUnits() {
 }
 
 .back-link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 }
 
@@ -280,14 +282,16 @@ function backToUnits() {
      the .faction-view.themed class keeps these rules from touching anything else. -->
 <style>
 :root[data-theme='light'] .faction-view.themed {
-  --accent: var(--fa-light);
+    --accent: var(--fa-light);
+    --accent-text: var(--fa-light);
   --accent-hover: color-mix(in srgb, var(--fa-light) 80%, black);
   --link-accent: var(--accent);
   --link-accent-hover: var(--accent-hover);
 }
 
 :root[data-theme='dark'] .faction-view.themed {
-  --accent: var(--fa-dark);
+      --accent: var(--fa-dark);
+      --accent-text: var(--fa-dark);
   --accent-hover: color-mix(in srgb, var(--fa-dark) 80%, white);
   --link-accent: #e8c96a;
   --link-accent-hover: #f0d98a;

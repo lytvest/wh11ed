@@ -240,7 +240,7 @@ const faction = computed(() =>
 
 .hero-subtitle {
   font-size: 0.95rem;
-  color: var(--accent);
+  color: var(--accent-text);
   font-style: italic;
 }
 
@@ -339,7 +339,7 @@ const faction = computed(() =>
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent);
+  color: var(--accent-text);
   border: 1px solid var(--accent);
   padding: 1px 5px;
   white-space: nowrap;

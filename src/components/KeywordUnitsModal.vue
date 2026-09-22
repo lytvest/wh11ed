@@ -67,7 +67,7 @@ const title = computed(() => labels.value.dsUnitsWithKeyword.replace('{kw}', pro
 }
 
 .kum-item:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   text-decoration: none;
 }
 

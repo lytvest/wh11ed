@@ -360,7 +360,7 @@ p {
 }
 
 .flow-arrow {
-  color: var(--accent);
+  color: var(--accent-text);
   flex-shrink: 0;
   font-weight: 600;
 }

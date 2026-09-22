@@ -161,11 +161,11 @@ function isPerEach(text) {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--accent);
+  color: var(--accent-text);
   white-space: nowrap;
 }
 .mcard.collapsible .mcard-chev {
-  color: var(--accent);
+  color: var(--accent-text);
   order: 3;
 }
 .mcard.collapsible.is-open .mcard-chev {

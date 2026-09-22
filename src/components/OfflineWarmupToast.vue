@@ -63,7 +63,7 @@ watch(status, (s) => {
 }
 
 .owt-icon {
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 1rem;
   flex-shrink: 0;
 }

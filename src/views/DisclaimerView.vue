@@ -61,7 +61,7 @@ const contactEmail = 'gorlovevgeni9617@gmail.com'
 }
 
 .contact a {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

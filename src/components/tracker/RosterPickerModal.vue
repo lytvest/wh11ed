@@ -170,11 +170,11 @@ async function useLink() {
   padding: 0.6rem 0.75rem; border: 1px solid var(--border);
   background: var(--bg-card); color: var(--text-primary); cursor: pointer;
 }
-.rp-row:hover { border-color: var(--accent); }
+.rp-row:hover { border-color: var(--accent-text); }
 .rp-row.off { opacity: 0.45; cursor: not-allowed; }
 .rp-row.off:hover { border-color: var(--border); }
 .rp-note { margin: 0 0 0.25rem; color: var(--text-muted); font-size: 0.78rem; line-height: 1.4; }
-.rp-row.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.rp-row.on { border-color: var(--accent-text); box-shadow: inset 0 0 0 1px var(--accent); }
 .rp-name {
   font-weight: 600; font-size: 0.9rem;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;

@@ -130,7 +130,7 @@ watch(
 /* Custom header (BaseModal's default #header slot only takes a plain title string — this needs
    the points badge alongside it), duplicating BaseModal's own header look, same as every other
    custom-header modal in the app (e.g. DetachmentPickerModal.vue). */
-.erm-head-pts { font-family: var(--font-mono); font-weight: 700; font-size: 0.95rem; color: var(--accent); }
+.erm-head-pts { font-family: var(--font-mono); font-weight: 700; font-size: 0.95rem; color: var(--accent-text); }
 
 .modal-body { padding: 0.9rem; overflow-y: auto; font-size: 0.85rem; line-height: 1.5; color: var(--text-primary); }
 .erm-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }

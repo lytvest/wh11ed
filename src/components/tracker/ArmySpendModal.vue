@@ -62,7 +62,7 @@ const labels = computed(() => ui[locale.value])
 <style scoped>
 /* Header mirrors the other tracker picker modals (ArmyMultiPickerModal / DetachmentPickerModal). */
 /* Remaining-pool badge (the resource being spent). */
-.pool { font-size: 1rem; font-family: var(--font-mono); font-weight: 700; color: var(--accent); font-style: normal; }
+.pool { font-size: 1rem; font-family: var(--font-mono); font-weight: 700; color: var(--accent-text); font-style: normal; }
 
 /* Roomier than the default list — these rows are cards, not one-liners. */
 .modal-list { gap: 0.4rem; }
@@ -84,7 +84,7 @@ const labels = computed(() => ui[locale.value])
   color: var(--text-primary);
   transition: background 0.15s, border-color 0.15s;
 }
-.opt:hover:not(:disabled) { border-color: var(--accent); }
+.opt:hover:not(:disabled) { border-color: var(--accent-text); }
 .opt:disabled { opacity: 0.45; cursor: default; }
 
 .opt-name { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); overflow-wrap: anywhere; }
@@ -93,7 +93,7 @@ const labels = computed(() => ui[locale.value])
   font-family: var(--font-mono);
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .opt:disabled .opt-cost { color: var(--text-dim); }
 </style>

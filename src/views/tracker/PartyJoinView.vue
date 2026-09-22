@@ -262,14 +262,14 @@ onMounted(() => {
   text-align: left;
   cursor: pointer;
 }
-@media (hover: hover) { .pj-seat:not(:disabled):hover { border-color: var(--accent); } }
+@media (hover: hover) { .pj-seat:not(:disabled):hover { border-color: var(--accent-text); } }
 .pj-seat:disabled { cursor: default; opacity: 0.6; }
 .pj-seat-name { font-size: 1.05rem; font-weight: 600; }
 .pj-seat-sub, .pj-seat-taken { font-size: 0.78rem; color: var(--text-muted); }
-.pj-seat-taken { color: var(--accent); }
+.pj-seat-taken { color: var(--accent-text); }
 .pj-err {
   margin: 0.6rem 0 0;
   font-size: 0.85rem;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 </style>

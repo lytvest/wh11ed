@@ -122,7 +122,7 @@ function toneOf(f) {
   background: var(--bg-secondary);
   transition: border-color 0.15s;
 }
-.fac:has(.fac-link:hover) { border-color: var(--accent); }
+.fac:has(.fac-link:hover) { border-color: var(--accent-text); }
 .fac-link {
   flex: 1;
   min-width: 0;

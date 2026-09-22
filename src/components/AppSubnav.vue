@@ -260,8 +260,8 @@ const subNavItems = computed(() => {
 }
 
 .subnav-link.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  color: var(--accent-text);
+  border-bottom-color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -327,12 +327,12 @@ const subNavItems = computed(() => {
 }
 
 a.nd-link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 }
 
 .nd-link.current {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
 }
 

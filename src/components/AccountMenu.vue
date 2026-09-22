@@ -141,11 +141,11 @@ onUnmounted(() => window.removeEventListener('keydown', onEscape))
 }
 .account-btn.active {
   background: color-mix(in srgb, var(--accent) 30%, transparent);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: #fff;
 }
 /* Signed in is a state worth reading off the closed button, not only inside the menu. */
-.account-btn.authed { color: var(--accent); }
+.account-btn.authed { color: var(--accent-text); }
 .account-btn.authed:hover { color: #fff; }
 
 .account-backdrop {
@@ -178,7 +178,7 @@ onUnmounted(() => window.removeEventListener('keydown', onEscape))
   color: var(--text-primary);
   word-break: break-all;
 }
-.am-who .bi { color: var(--accent); flex-shrink: 0; }
+.am-who .bi { color: var(--accent-text); flex-shrink: 0; }
 
 .am-hint {
   margin: 0;
@@ -201,7 +201,7 @@ onUnmounted(() => window.removeEventListener('keydown', onEscape))
   color: var(--text-primary);
   transition: color 0.15s;
 }
-.am-item:hover { color: var(--accent); }
+.am-item:hover { color: var(--accent-text); }
 .am-mock { color: var(--text-muted); }
 
 /* Yandex ID branded sign-in button (login is Yandex OAuth) — brand red + the "Я" mark. */

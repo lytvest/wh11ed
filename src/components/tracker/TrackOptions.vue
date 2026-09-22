@@ -121,7 +121,7 @@ function reasonOf(o) {
   font-family: var(--font-display);
   font-size: 1.21rem;
   font-weight: 500;
-  color: var(--accent);
+  color: var(--accent-text);
   margin: 0 0 0.6rem;
 }
 .opt-row { display: flex; align-items: stretch; }
@@ -150,11 +150,11 @@ function reasonOf(o) {
    longer takes an accent border, so it has no frame to win with. */
 .check:hover,
 .opt-info:hover { position: relative; z-index: 1; }
-.opt-info:hover { color: var(--accent); border-color: var(--accent); }
+.opt-info:hover { color: var(--accent-text); border-color: var(--accent-text); }
 .opt-guide-row { margin-top: 0.6rem; }
 .opt-guide {
   font-size: 0.78rem;
   color: var(--text-dim);
 }
-.opt-guide:hover { color: var(--accent); }
+.opt-guide:hover { color: var(--accent-text); }
 </style>

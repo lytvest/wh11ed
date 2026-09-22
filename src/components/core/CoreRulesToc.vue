@@ -176,12 +176,12 @@ const activeChapter = computed(() => {
 }
 
 .core-toc-chapter:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 }
 
 .core-toc-group.current .core-toc-chapter {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .core-toc-list {
@@ -203,7 +203,7 @@ const activeChapter = computed(() => {
 }
 
 .core-toc-link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 }
 
@@ -215,7 +215,7 @@ const activeChapter = computed(() => {
 .core-toc-num {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--accent);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -266,7 +266,7 @@ const activeChapter = computed(() => {
 }
 
 .core-toc-subs-link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 }
 

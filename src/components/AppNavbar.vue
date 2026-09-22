@@ -566,7 +566,7 @@ function closeRulesMenu() {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent);
+  color: var(--accent-text);
   margin: 0 0 0.3rem;
   padding-bottom: 0.25rem;
   border-bottom: 1px solid var(--border);
@@ -585,7 +585,7 @@ function closeRulesMenu() {
 }
 
 a.nd-link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 }
 
@@ -708,7 +708,7 @@ a.nd-link:hover {
 
 .lore-btn.active {
   background: color-mix(in srgb, var(--accent) 30%, transparent);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: #fff;
 }
 
@@ -739,7 +739,7 @@ a.nd-link:hover {
 
 .settings-btn.active {
   background: color-mix(in srgb, var(--accent) 30%, transparent);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: #fff;
 }
 
@@ -796,7 +796,7 @@ a.nd-link:hover {
 }
 
 .settings-item.active {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* Who you are, above the way out — a line, not a control. */
@@ -816,7 +816,7 @@ a.nd-link:hover {
   width: 1.2rem;
   text-align: center;
   flex-shrink: 0;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .settings-item:disabled {

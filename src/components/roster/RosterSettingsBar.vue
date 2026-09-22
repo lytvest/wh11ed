@@ -386,7 +386,7 @@ const moreOpen = ref(false)
   line-height: 1;
   cursor: pointer;
 }
-@media (hover: hover) { .rw-more:hover { color: var(--accent); border-color: var(--accent); } }
+@media (hover: hover) { .rw-more:hover { color: var(--accent-text); border-color: var(--accent-text); } }
 
 .rw-more-body { padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
 .rw-more-body textarea {

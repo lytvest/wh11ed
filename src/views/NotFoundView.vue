@@ -75,7 +75,7 @@ onUnmounted(() => {
 
 .home-link {
   display: inline-block;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
   text-decoration: none;
 }

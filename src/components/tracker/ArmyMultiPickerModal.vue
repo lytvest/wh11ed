@@ -76,7 +76,7 @@ const labels = computed(() => ui[locale.value])
 <style scoped>
 /* Header mirrors the other tracker picker modals (DetachmentPickerModal). */
 .pick-count { font-size: 0.85rem; font-family: var(--font-mono); color: var(--text-muted); font-style: normal; }
-.pick-count.full { color: var(--accent); }
+.pick-count.full { color: var(--accent-text); }
 
 /* Roomier than the default list — these rows are cards, not one-liners. */
 .modal-list { gap: 0.4rem; }
@@ -99,8 +99,8 @@ const labels = computed(() => ui[locale.value])
   color: var(--text-primary);
   transition: background 0.15s, border-color 0.15s;
 }
-.opt:hover { border-color: var(--accent); }
-.opt.on { background: color-mix(in srgb, var(--accent) 16%, transparent); border-color: var(--accent); }
+.opt:hover { border-color: var(--accent-text); }
+.opt.on { background: color-mix(in srgb, var(--accent) 16%, transparent); border-color: var(--accent-text); }
 
 .opt-check {
   flex-shrink: 0;
@@ -109,7 +109,7 @@ const labels = computed(() => ui[locale.value])
   line-height: 1.2;
   color: var(--text-dim);
 }
-.opt.on .opt-check { color: var(--accent); }
+.opt.on .opt-check { color: var(--accent-text); }
 
 .opt-main { min-width: 0; flex: 1 1 auto; }
 
@@ -125,7 +125,7 @@ const labels = computed(() => ui[locale.value])
   font-size: 0.72rem;
   font-weight: 700;
   font-family: var(--font-mono);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 /* Rule text — RuleBody renders a bare <p> (its root class isn't bound), so reach it with :deep and
    let the colour inherit from `.opt` (fixes the black-on-dark UA button default). */

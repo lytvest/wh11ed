@@ -385,12 +385,12 @@ function togglePhase(key) {
 
 .strat-toggle:hover {
   color: var(--text-primary);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .strat-toggle.active {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: #fff;
 }
 
@@ -418,7 +418,7 @@ function togglePhase(key) {
 }
 
 .phase-head:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .phase-chev {
@@ -458,12 +458,12 @@ function togglePhase(key) {
 
 .strat-filter:hover {
   color: var(--text-primary);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .strat-filter.active {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: #fff;
 }
 

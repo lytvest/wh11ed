@@ -66,6 +66,6 @@ function toggleOpen(slug) { openId.value = openId.value === slug ? null : slug }
 
 <style scoped>
 .mh-count { font-family: var(--font-mono); font-weight: 700; color: var(--text-muted); font-size: 0.9rem; }
-.mh-count.full { color: var(--accent); }
+.mh-count.full { color: var(--accent-text); }
 
 </style>

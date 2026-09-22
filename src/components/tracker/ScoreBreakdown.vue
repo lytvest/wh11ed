@@ -214,13 +214,13 @@ function secondaries(pi) {
   background: var(--bg-card); border: 1px solid var(--border);
   color: var(--text-primary); font-size: 0.85rem; font-weight: 600; cursor: pointer;
 }
-.bd-toggle:hover { border-color: var(--accent); }
+.bd-toggle:hover { border-color: var(--accent-text); }
 .bd-body { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.75rem; }
 .bd-player {
   background: var(--bg-card); border: 1px solid var(--border); padding: 0.8rem;
 }
 .bd-name { font-family: var(--font-display); font-size: 1.45rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.6rem; }
-.bd-name.win { color: var(--accent); }
+.bd-name.win { color: var(--accent-text); }
 
 .grid {
   display: grid;
@@ -260,7 +260,7 @@ function secondaries(pi) {
   display: flex;
   align-items: center;
 }
-.tick { color: var(--accent); font-weight: 700; }
+.tick { color: var(--accent-text); font-weight: 700; }
 
 @media (max-width: 420px) {
   .grid { grid-template-columns: minmax(0, 1fr) repeat(5, 24px) auto; gap: 2px; }

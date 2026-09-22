@@ -106,12 +106,12 @@ const text = computed(() => {
   width: 0.75rem;
   height: 0.75rem;
   border: 2px solid var(--border);
-  border-top-color: var(--accent);
+  border-top-color: var(--accent-text);
   border-radius: 50%;
   animation: si-rot 0.8s linear infinite;
 }
 @keyframes si-rot { to { transform: rotate(360deg); } }
-.is-problem { color: var(--accent); }
+.is-problem { color: var(--accent-text); }
 .is-problem .bi { font-size: 0.9rem; }
 .si-text { white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .si-spin { animation: none; } }

@@ -502,7 +502,7 @@ function onEndBattle(reason) {
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.rb-round.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.rb-round.on { background: var(--accent); color: #fff; border-color: var(--accent-text); }
 /* The phase row sits under the rounds and reads as secondary to them: the round is the game's
    spine, the phase is where inside it you are. */
 .phase-bar {
@@ -533,7 +533,7 @@ function onEndBattle(reason) {
   font-size: 0.85rem;
   cursor: pointer;
 }
-.pb-now:hover { border-color: var(--accent); }
+.pb-now:hover { border-color: var(--accent-text); }
 .pb-who { color: var(--text-muted); }
 .pb-phase { color: var(--text-primary); font-weight: 600; }
 .rb-nav {
@@ -563,7 +563,7 @@ function onEndBattle(reason) {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-right: 0.35rem;
 }
 .twist-card-body {
@@ -592,7 +592,7 @@ function onEndBattle(reason) {
    what it looks like from the outside). Ellipsis instead of a floor, with the full name on
    `title` — the same lesson as the setup cards' `minmax(0, 1fr)`. */
 .proster-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.proster:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.proster:hover { border-color: var(--accent-text); background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .players { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 .player {
   background: var(--bg-card);
@@ -636,9 +636,9 @@ function onEndBattle(reason) {
   text-align: left;
   margin-bottom: 0.55rem;
 }
-.card-open:hover { border-color: var(--accent); }
+.card-open:hover { border-color: var(--accent-text); }
 .card-name { font-weight: 700; font-size: 0.88rem; color: var(--text-primary); }
-.card-vp { font-family: var(--font-mono); font-weight: 700; font-size: 0.82rem; color: var(--accent); flex-shrink: 0; }
+.card-vp { font-family: var(--font-mono); font-weight: 700; font-size: 0.82rem; color: var(--accent-text); flex-shrink: 0; }
 .score-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.55rem; }
 /* Same gap SecondaryDeck opens above itself (.sec), so the row reads as its own band under it.
    The CP label drops `.sr-label`'s column width here — it labels the stepper right next to it,
@@ -704,7 +704,7 @@ function onEndBattle(reason) {
 
 /* The broadcast button is a STATE: lit while the game is streaming to an overlay. */
 .bc-on {
-  color: var(--accent);
-  border-color: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent-text);
 }
 </style>

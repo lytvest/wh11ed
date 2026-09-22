@@ -157,7 +157,7 @@ There is no separate style passport: the design tokens at the top of `src/style.
 Read that `:root` block before styling anything new — it is short and it answers every "which
 colour / which face / how big" question.
 
-- **Colour** — `--bg-*` surfaces, `--accent` (the house oxblood), `--text-*`, `--border*`, the
+- **Colour** — `--bg-*` surfaces, `--accent` (the house blue), `--text-*`, `--border*`, the
   ability tints (`--ability-weapon` / `--ability-unit`) and the sub-rule set. There is a dark
   theme (`:root[data-theme='dark']` further down the same file), so a hex literal in a component
   is a colour that will not change with the theme — write `var(--token)` unless the surface is
@@ -166,9 +166,9 @@ colour / which face / how big" question.
 - **`--danger`** is the one red that means "something is wrong": points over budget, issue
   badges, validation errors, losses, destructive hover. Until 2026-09-21 it had no token and sat
   as `#c0392b` (or its bootstrap cousin `#d9534f`) in 17 files, each with — or, more often,
-  without — its own dark-theme override; now the token carries the dark shade itself, so a
-  component never writes a `[data-theme='dark']` rule just to brighten a red. Not every red is
-  danger: `StratCard`'s opponent-turn tint is a turn colour and keeps its own value.
+  without — its own dark-theme override; now   the token carries the dark shade itself, so a
+  component never writes a `[data-theme='dark']` rule just to brighten a red. `StratCard`'s
+  opponent-turn tint now goes through the token too.
 - **Type** — `--font-display` (Sofia Sans Extra Condensed) on every heading and title,
   `--font-sans` (Inter) on everything else, `--font-serif` (EB Garamond) only on lore flavour
   text. The heading scale is `--fs-*` / `--fw-heading`; new headings pick a step, they don't

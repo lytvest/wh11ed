@@ -155,13 +155,13 @@ function pick(m, l) {
   padding: 0.3rem 1.1rem;
   border: 1px solid var(--border);
   background: var(--bg-secondary);
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.84rem;
   font-weight: 700;
   cursor: pointer;
 }
-.lp-pick:hover { border-color: var(--accent); }
-.lp-pick.on { background: var(--accent); color: var(--text-on-accent); border-color: var(--accent); }
+.lp-pick:hover { border-color: var(--accent-text); }
+.lp-pick.on { background: var(--accent); color: var(--text-on-accent); border-color: var(--accent-text); }
 
 @media (min-width: 901px) {
   .lp-body {

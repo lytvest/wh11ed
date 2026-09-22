@@ -166,7 +166,7 @@ function toggleBriefing() {
 /* The heading here is two lines deep, so the close button rides at the top of it rather than
    centred against the whole block. */
 .modal-head { align-items: flex-start; }
-.mh-vp { font-family: var(--font-mono); font-weight: 700; color: var(--accent); font-size: 0.95rem; }
+.mh-vp { font-family: var(--font-mono); font-weight: 700; color: var(--accent-text); font-size: 0.95rem; }
 /* Denser header than the default. */
 .mh-close { min-width: 32px; min-height: 32px; }
 .brief-toggle {
@@ -176,7 +176,7 @@ function toggleBriefing() {
   color: var(--text-primary); font-size: 0.78rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.03em; cursor: pointer;
 }
-.brief-toggle:hover { border-color: var(--accent); }
+.brief-toggle:hover { border-color: var(--accent-text); }
 .brief-toggle .bi { font-size: 0.9rem; color: var(--text-muted); }
 .redraw-btn {
   display: block;
@@ -211,9 +211,9 @@ function toggleBriefing() {
   cursor: pointer;
   background: var(--bg-secondary);
 }
-.m-cond.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.m-cond.on { border-color: var(--accent-text); background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .m-cond.readonly { cursor: default; }
-.m-check { width: 20px; height: 20px; margin-top: 1px; flex-shrink: 0; accent-color: var(--accent); cursor: pointer; }
+.m-check { width: 20px; height: 20px; margin-top: 1px; flex-shrink: 0; accent-color: var(--accent-text); cursor: pointer; }
 /* Static value shown in place of the stepper/checkbox for a read-only (set-aside) card. */
 .m-static {
   flex-shrink: 0;
@@ -224,7 +224,7 @@ function toggleBriefing() {
   font-size: 0.9rem;
   color: var(--text-dim);
 }
-.m-static.hit { color: var(--accent); }
+.m-static.hit { color: var(--accent-text); }
 .view-only {
   display: flex;
   align-items: center;

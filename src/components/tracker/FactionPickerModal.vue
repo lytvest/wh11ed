@@ -132,8 +132,8 @@ function abbrOf(slug) {
   background: var(--bg-secondary);
   transition: background 0.15s, border-color 0.15s;
 }
-.fac:has(.fac-link:hover) { border-color: var(--accent); }
-.fac.on { background: color-mix(in srgb, var(--accent) 16%, transparent); border-color: var(--accent); }
+.fac:has(.fac-link:hover) { border-color: var(--accent-text); }
+.fac.on { background: color-mix(in srgb, var(--accent) 16%, transparent); border-color: var(--accent-text); }
 .fac-link {
   flex: 1;
   min-width: 0;
@@ -147,5 +147,5 @@ function abbrOf(slug) {
   cursor: pointer;
 }
 .fac-name { flex: 1; min-width: 0; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
-.fac-check { color: var(--accent); font-weight: 700; flex-shrink: 0; }
+.fac-check { color: var(--accent-text); font-weight: 700; flex-shrink: 0; }
 </style>

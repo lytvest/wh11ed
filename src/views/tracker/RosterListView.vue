@@ -472,7 +472,7 @@ function confirmDelete() {
 /* The card's left edge is its faction's colour whatever the input; only the full-border
    highlight is a pointer's, and on a touch screen it would stay on the last card tapped. */
 @media (hover: hover) {
-  .roster:hover { border-color: var(--accent); }
+  .roster:hover { border-color: var(--accent-text); }
   .roster.themed:hover { border-color: var(--fa-light, var(--accent)); }
 }
 @media (hover: hover) and (prefers-color-scheme: dark) {

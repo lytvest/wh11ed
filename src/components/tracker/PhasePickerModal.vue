@@ -84,10 +84,10 @@ const turns = computed(() => props.names.map((name) => ({ name })))
   font-family: inherit;
   cursor: pointer;
 }
-.pp-phase:hover { border-color: var(--accent); }
+.pp-phase:hover { border-color: var(--accent-text); }
 .pp-phase.on {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: #fff;
   font-weight: 600;
 }

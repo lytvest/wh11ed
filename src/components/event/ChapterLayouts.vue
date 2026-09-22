@@ -331,7 +331,7 @@ const currentLayout = computed(() =>
   font-weight: 600;
 }
 .footprint-source :deep(.ext-link) {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
 }
 
@@ -378,7 +378,7 @@ const currentLayout = computed(() =>
 }
 .key-toggle:hover {
   color: var(--text-primary);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .legend {
@@ -568,11 +568,11 @@ const currentLayout = computed(() =>
 }
 .measurements-toggle:hover {
   color: var(--text-primary);
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 .measurements-toggle[aria-pressed="true"] {
-  color: var(--accent);
-  border-color: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent-text);
 }
 .tab-main {
   font-family: var(--font-display);

@@ -457,6 +457,6 @@ onUnmounted(() => clearInterval(timer))
 .pt-err {
   margin: 0.6rem 0 0;
   font-size: 0.78rem;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 </style>

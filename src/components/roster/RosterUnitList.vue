@@ -233,7 +233,7 @@ const narrow = useMediaQuery('(max-width: 899px)')
   margin-bottom: 0.5rem;
   overflow: hidden;
 }
-@media (hover: hover) { .rul-unit:hover { border-color: var(--accent); } }
+@media (hover: hover) { .rul-unit:hover { border-color: var(--accent-text); } }
 /* Closes the gap to the character indented below it — the block's own look is the shared
    .roster-attached / .roster-sum pair in style.css. */
 .rul-unit:has(+ .rul-attached) { margin-bottom: 0; }
@@ -277,7 +277,7 @@ const narrow = useMediaQuery('(max-width: 899px)')
   width: 2rem; height: 2.4rem; padding: 0; border: none; background: none;
   color: var(--text-muted); font-size: 0.95rem; cursor: pointer;
 }
-@media (hover: hover) { .rul-dup:hover:not(:disabled) { color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); } }
+@media (hover: hover) { .rul-dup:hover:not(:disabled) { color: var(--accent-text); background: color-mix(in srgb, var(--accent) 8%, transparent); } }
 .rul-dup:disabled { opacity: 0.35; cursor: not-allowed; }
 @media (hover: hover) { .rul-del:hover { color: var(--danger); background: color-mix(in srgb, var(--danger) 8%, transparent); } }
 

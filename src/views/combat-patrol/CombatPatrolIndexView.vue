@@ -138,7 +138,7 @@ const pinned = computed(() => pinnedFactionsFrom(groups.value))
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: var(--accent);
+  color: var(--accent-text);
   margin: 0 0 0.6rem;
   padding-bottom: 0.4rem;
   border-bottom: 1px solid var(--border);

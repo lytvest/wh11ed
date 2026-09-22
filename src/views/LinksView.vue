@@ -66,7 +66,7 @@ const LINKS = [
 .hero-subtitle {
   font-size: 0.85rem;
   letter-spacing: 2px;
-  color: var(--accent);
+  color: var(--accent-text);
   text-transform: uppercase;
   font-weight: 600;
   font-family: var(--font-sans);
@@ -91,7 +91,7 @@ const LINKS = [
 }
 
 .link-card:hover {
-  border-top-color: var(--accent);
+  border-top-color: var(--accent-text);
   box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 18%, transparent);
   text-decoration: none;
 }
@@ -110,7 +110,7 @@ const LINKS = [
 }
 
 .link-host i {
-  color: var(--accent);
+  color: var(--accent-text);
   margin-right: 0.2rem;
 }
 

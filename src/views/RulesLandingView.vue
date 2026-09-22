@@ -87,7 +87,7 @@ const t = computed(() => rulesLanding[locale.value])
 }
 
 .section-card:hover {
-  border-top-color: var(--accent);
+  border-top-color: var(--accent-text);
   box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 18%, transparent);
   text-decoration: none;
 }
@@ -99,7 +99,7 @@ const t = computed(() => rulesLanding[locale.value])
 .section-badge {
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
   font-family: var(--font-mono);
   background: color-mix(in srgb, var(--accent) 10%, transparent);
   padding: 2px 7px;

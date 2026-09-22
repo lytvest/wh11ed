@@ -252,8 +252,8 @@ const filteredPrimaryGroups = computed(() =>
   font-weight: 600;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
-.chip:hover { color: var(--text-primary); border-color: var(--accent); }
-.chip.on { background: var(--accent); color: var(--text-on-accent); border-color: var(--accent); }
+.chip:hover { color: var(--text-primary); border-color: var(--accent-text); }
+.chip.on { background: var(--accent); color: var(--text-on-accent); border-color: var(--accent-text); }
 .chip-icon { width: 18px; height: 18px; object-fit: contain; flex: none; }
 
 .m-section { margin-top: 2rem; }

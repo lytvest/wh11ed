@@ -176,7 +176,7 @@ function pickChapter(id) {
 }
 
 .fpb-trigger:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .fpb-trigger-main {
