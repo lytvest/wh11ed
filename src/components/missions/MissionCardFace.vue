@@ -46,9 +46,9 @@
           <h3>{{ displayName }}</h3>
           <div
             v-if="locale === 'ru' && mission.nameRu"
-            class="card-back-name-en"
+            class="card-back-name-translation"
           >
-            {{ mission.name }}
+            {{ mission.nameRu }}
           </div>
         </div>
         <p
@@ -77,9 +77,9 @@
             </h3>
             <div
               v-if="locale === 'ru' && mission.nameRu"
-              class="card-name-en"
+              class="card-name-translation"
             >
-              {{ mission.name }}
+              {{ mission.nameRu }}
             </div>
           </div>
         </header>
@@ -203,12 +203,9 @@ const labels = computed(() => ui[locale.value])
 
 const role = computed(() => props.mission.role || (props.mission.roles && props.mission.roles[0]))
 
-// The card prints the localized name on top with the English original as a subline — but only in
-// RU. In EN the card is English throughout: the original name was already the display name, and
-// a `nameRu` subline under it would be Russian text on an otherwise English card.
-const displayName = computed(() =>
-  locale.value === 'ru' ? (props.mission.nameRu || props.mission.name) : props.mission.name,
-)
+// Keep the canonical English mission name prominent in both locales. On the RU page, the
+// translation is shown as the smaller subline beneath it.
+const displayName = computed(() => props.mission.name)
 
 function deckTag(kind) {
   const map = locale.value === 'ru' ? SIDE_DECK_TAG : SIDE_DECK_TAG_EN
@@ -423,7 +420,7 @@ function vpLabel(vp) {
   display: block;
   overflow-wrap: anywhere;
 }
-.card-name-en {
+.card-name-translation {
   color: #777;
   font-size: calc(13px * var(--card-scale));
   font-weight: 400;
@@ -463,7 +460,7 @@ function vpLabel(vp) {
 .card--primary.card--back .card-back-name h3 {
   color: #ffffff;
 }
-.card--primary.card--back .card-back-name-en {
+.card--primary.card--back .card-back-name-translation {
   color: #c0cad7;
 }
 .card--primary.card--back .card-back-lore {
@@ -516,7 +513,7 @@ function vpLabel(vp) {
   line-height: 1.15;
   overflow-wrap: anywhere;
 }
-.card-back-name-en {
+.card-back-name-translation {
   color: #5c6779;
   font-size: calc(13px * var(--card-scale));
   font-weight: 600;
